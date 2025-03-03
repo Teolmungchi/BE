@@ -1,15 +1,13 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { LoggerMiddleware } from './global/common/middleware/logger/logger.middleware';
+import { UserModule } from './domain/user/module/user.module';
+import { DatabaseModule } from './global/database/module/database.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, //전역 모듈로 설정(모든 곳에서 사용 가능)
-    }),
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [DatabaseModule, UserModule],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
