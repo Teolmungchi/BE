@@ -1,16 +1,17 @@
 import {
-  ArgumentsHost,
-  Catch,
   ExceptionFilter,
+  Catch,
+  ArgumentsHost,
   HttpException,
 } from '@nestjs/common';
+import { Response } from 'express';
 
 @Catch(HttpException)
 export class GlobalExceptionHandler implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const status = exception.getStatus();
     const response = ctx.getResponse<Response>();
+    const status = exception.getStatus();
 
     response.status(status).json({
       statusCode: status,
@@ -21,6 +22,7 @@ export class GlobalExceptionHandler implements ExceptionFilter {
   }
 }
 
+// To use this filter globally, add it in your main.ts or any module class
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 
