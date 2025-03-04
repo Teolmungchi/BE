@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
 import { UserRepository } from '../../../domain/users/repository/user.repository';
+import { CommonException } from '../../exception/common-exception';
+import { ErrorCode } from '../../exception/error-code';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new CommonException(ErrorCode.NOT_FOUND_USER);
     }
 
     return user;
