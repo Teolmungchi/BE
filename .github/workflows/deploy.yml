@@ -26,8 +26,8 @@ jobs:
 
       - name: Install pnpm
         run: |
-          corepack prepare pnpm@latest --activate
-          echo "pnpm version: $(pnpm --version)"
+          npm install -g pnpm
+          echo "$(npm bin -g)" >> $GITHUB_PATH
 
       - name: Install Dependencies
         run: pnpm install
