@@ -15,33 +15,24 @@ jobs:
   CI:
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Node.js 환경 설정
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20.18.0
           cache: 'pnpm'
 
-      # pnpm 설치
-      - name: Install pnpm
+      - name: Enable Corepack and Prepare pnpm
         run: |
           corepack enable
           corepack prepare pnpm@latest --activate
           echo "pnpm version: $(pnpm --version)"
 
-      # .env 파일 생성
-      - name: Add .env
-        run: |
-          echo "${{ secrets.ENV }}" | base64 --decode > ./.env
-
-      # 의존성 설치
       - name: Install Dependencies
         run: pnpm install
 
-      # 프로젝트 빌드
       - name: Build NestJS Application
         run: pnpm run build
 
