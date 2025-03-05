@@ -24,11 +24,10 @@ jobs:
           node-version: 20.18.0
           cache: 'pnpm'
 
-      - name: Install pnpm
+      - name: Enable Corepack and Prepare pnpm
         run: |
-          npm install -g pnpm
-          NPM_PREFIX=$(npm config get prefix)
-          echo "$NPM_PREFIX/bin" >> $GITHUB_PATH
+          corepack enable
+          corepack prepare pnpm@latest --activate
           echo "pnpm version: $(pnpm --version)"
 
       - name: Install Dependencies
