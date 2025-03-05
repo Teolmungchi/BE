@@ -9,15 +9,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  app.use((req, res, next) => {
+    if (req.originalUrl === '/' || req.path === '/') {
+      return res.redirect('/api');
+    }
+    next();
+  });
+
   // Swagger 설정
   const config = new DocumentBuilder()
     .setTitle('털뭉치 API')
     .setDescription('털뭉치 Documentation')
     .setVersion('1.0')
-    .addBearerAuth() // JWT 토큰 인증 추가 (옵션)
+    .addBearerAuth()
+    .setBasePath('api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); // 기본 URL: http://localhost:3000/api
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }
