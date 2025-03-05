@@ -27,7 +27,7 @@ jobs:
 
       - name: Add .env file
         run: |
-          echo "${{ secrets.ENV }}" | base64 --decode > ./.env
+          echo "${{ secrets.ENV }}" > ./.env
 
       - name: Install Dependencies
         run: npm install
