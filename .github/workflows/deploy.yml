@@ -7,6 +7,8 @@ on:
       - opened
       - synchronize
       - closed
+  push:
+    branches: ["main"]
 
 env:
   CONTAINER_NAME: teolmungchi
@@ -15,35 +17,23 @@ jobs:
   CI:
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Node.js 환경 설정
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20.18.0
-          cache: 'pnpm'
 
-      # pnpm 설치
-      - name: Install pnpm
+      - name: Add .env file
         run: |
-          npm install -g pnpm
-          echo "$(npm config get prefix)/bin" >> $GITHUB_PATH
-          pnpm --version
+          echo "${{ secrets.ENV }}" > ./.env
 
-      # .env 파일 생성
-      - name: Add .env
-        run: |
-          echo "${{ secrets.ENV }}" | base64 --decode > ./.env
-
-      # 의존성 설치
       - name: Install Dependencies
-        run: pnpm install
+        run: npm install
 
-      # 프로젝트 빌드
       - name: Build NestJS Application
-        run: pnpm run build
+        run: npm run build
 
       # PR이 병합된 경우 Docker 이미지 빌드 및 푸시
       - name: Login to Docker Hub
@@ -83,7 +73,6 @@ jobs:
           script: |
             # Docker 로그인
             docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PASSWORD }}
-
             # 기존 컨테이너 정리
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
