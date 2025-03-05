@@ -27,7 +27,9 @@ jobs:
       - name: Install pnpm
         run: |
           npm install -g pnpm
-          echo "$(npm bin -g)" >> $GITHUB_PATH
+          NPM_PREFIX=$(npm config get prefix)
+          echo "$NPM_PREFIX/bin" >> $GITHUB_PATH
+          echo "pnpm version: $(pnpm --version)"
 
       - name: Install Dependencies
         run: pnpm install
