@@ -26,9 +26,9 @@ jobs:
         with:
           node-version: 20.18.0
 
-      - name: Add .env file
+      - name: Add .env
         run: |
-          echo "${{ secrets.ENV }}" > ./.env
+          echo "${{ secrets.ENV }}" | base64 --decode > ./.env
 
       - name: Install Dependencies
         run: npm install
