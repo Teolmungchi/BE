@@ -28,7 +28,7 @@ jobs:
 
       - name: Add .env
         run: |
-          echo "${{ secrets.ENV }}" | base64 --decode > ./.env
+          echo "${{ secrets.ENV }}" > ./.env
 
       - name: Install Dependencies
         run: npm install
@@ -36,7 +36,6 @@ jobs:
       - name: Build NestJS Application
         run: npm run build
 
-      # PR이 병합된 경우 Docker 이미지 빌드 및 푸시
       - name: Login to Docker Hub
         if: github.event.pull_request.merged == true
         uses: docker/login-action@v2
@@ -60,7 +59,6 @@ jobs:
           cache-to: type=gha,mode=max
 
   CD:
-    if: github.event.pull_request.merged == true
     needs: [CI]
     runs-on: ubuntu-20.04
     steps:
@@ -72,17 +70,13 @@ jobs:
           key: ${{ secrets.REMOTE_SSH_KEY_DEV }}
           port: ${{ secrets.REMOTE_PORT_DEV }}
           script: |
-            # Docker 로그인
             docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PASSWORD }}
-            # 기존 컨테이너 정리
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
             docker image rm ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }} || true
 
-            # .env 파일 생성
-            echo "${{ secrets.ENV }}" | base64 --decode > /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env
+            echo "${{ secrets.ENV }}" > /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env
 
-            # 새 컨테이너 실행
             docker run -d -p 3000:3000 \
               --name ${{ env.CONTAINER_NAME }} \
               --env-file /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env \
@@ -90,5 +84,4 @@ jobs:
               --log-opt max-size=10m --log-opt max-file=3 \
               ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }}
 
-            # 사용되지 않는 이미지 정리
             docker image prune -f
