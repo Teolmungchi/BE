@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import { Client } from 'minio';
@@ -59,11 +59,11 @@ export class MinioService {
     try {
       const exists = await this.minioClient.bucketExists(this.bucket);
       if (!exists) {
-        console.log(`버킷 '${this.bucket}'이 존재하지 않음. 생성 중...`);
+        Logger.log(`버킷 '${this.bucket}'이 존재하지 않음. 생성 중...`);
         await this.minioClient.makeBucket(this.bucket);
-        console.log(`버킷 '${this.bucket}' 생성 완료.`);
+        Logger.log(`버킷 '${this.bucket}' 생성 완료.`);
       } else {
-        console.log(`버킷 '${this.bucket}'이 이미 존재합니다.`);
+        Logger.error(`버킷 '${this.bucket}'이 이미 존재합니다.`);
       }
     } catch (error) {
       console.error(`버킷 확인 중 오류 발생:`, error);
