@@ -78,6 +78,7 @@ jobs:
 
             docker run -d -p 3000:3000 \
               --name ${{ env.CONTAINER_NAME }} \
+              --network tmc-network \
               --env-file /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env \
               --restart=unless-stopped \
               --log-opt max-size=10m --log-opt max-file=3 \
