@@ -4,10 +4,16 @@ import { UsersModule } from './domain/users/module/users.module';
 import * as dotenv from 'dotenv';
 import { DatabaseModule } from './global/database/module/database.module';
 import { AuthModule } from './global/auth/module/auth.module';
+import { MinioModule } from './domain/s3/module/minio.module';
 
 dotenv.config();
 @Module({
-  imports: [DatabaseModule, UsersModule, AuthModule],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    AuthModule,
+    MinioModule,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
