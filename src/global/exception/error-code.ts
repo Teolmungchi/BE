@@ -36,11 +36,12 @@ export enum ErrorCode {
   TOKEN_TYPE_ERROR = '잘못된 토큰 타입입니다.',
   TOKEN_UNSUPPORTED_ERROR = '지원하지 않는 토큰입니다.',
   TOKEN_GENERATION_ERROR = '토큰 생성에 실패했습니다.',
-  TOKEN_UNKNOW_ERROR = '알 수 없는 토큰입니다.',
+  TOKEN_UNKNOWN_ERROR = '알 수 없는 토큰입니다.',
 
   // Internal Server Error
   INTERNAL_SERVER_ERROR = '서버 내부 오류입니다.',
-  UPLOAD_FILE_ERROR = '파일 업로드에 실패했습니다.',
+  UPLOAD_FILE_ERROR = '파일 업로드 URL 생성에 실패했습니다.',
+  DOWNLOAD_FILE_ERROR = '파일 다운로드 URL 생성에 실패했습니다.',
 }
 
 export function getHttpStatus(errorCode: ErrorCode): HttpStatus {
@@ -95,7 +96,7 @@ export function getHttpStatus(errorCode: ErrorCode): HttpStatus {
       return HttpStatus.UNAUTHORIZED;
     case ErrorCode.TOKEN_GENERATION_ERROR:
       return HttpStatus.UNAUTHORIZED;
-    case ErrorCode.TOKEN_UNKNOW_ERROR:
+    case ErrorCode.TOKEN_UNKNOWN_ERROR:
       return HttpStatus.UNAUTHORIZED;
     case ErrorCode.INTERNAL_SERVER_ERROR:
       return HttpStatus.INTERNAL_SERVER_ERROR;
