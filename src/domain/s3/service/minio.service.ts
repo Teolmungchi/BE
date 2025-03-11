@@ -36,6 +36,7 @@ export class MinioService {
     try {
       url = await this.minioClient.presignedPutObject(this.bucket, fileName, this.expiration);
     } catch (error) {
+      Logger.error(`파일 업로드 URL 생성 중 오류 발생:`, error);
       throw new CommonException(ErrorCode.UPLOAD_FILE_ERROR);
     }
 
@@ -49,6 +50,7 @@ export class MinioService {
     try {
       url = await this.minioClient.presignedGetObject(this.bucket, fileName, this.expiration * 60 * 24);
     } catch (error) {
+      Logger.error(`파일 다운로드 URL 생성 중 오류 발생:`, error);
       throw new CommonException(ErrorCode.DOWNLOAD_FILE_ERROR);
     }
 
