@@ -9,10 +9,10 @@ export class Feed {
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   author: User;
 
-  @Column({ name: 'title', type: 'varchar', length: 255 })
+  @Column({ name: 'title', type: 'text', charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci' })
   title: string;
 
-  @Column({ name: 'content', type: 'text' })
+  @Column({ name: 'content', type: 'text', charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci' })
   content: string;
 
   @Column({ name: 'image_url', type: 'varchar', length: 255 })
