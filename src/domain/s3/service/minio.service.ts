@@ -13,7 +13,7 @@ dotenv.config();
 export class MinioService {
   private readonly minioClient: Client;
   private readonly bucket: string = process.env.MINIO_BUCKET_NAME!;
-  private readonly expiration: number = 60;
+  private readonly expiration: number = 3600;
 
   constructor() {
     this.minioClient = new Client({
