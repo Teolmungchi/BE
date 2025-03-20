@@ -49,6 +49,7 @@ export class FeedController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드(게시글) 수정 완료' })
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async updateFeed(
     @Req() req,
     @Param('id', ParseIntPipe) id: number,
