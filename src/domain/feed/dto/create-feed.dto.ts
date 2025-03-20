@@ -4,14 +4,14 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateFeedDto {
   @ApiProperty({
     description: '피드(게시글) 제목',
-    example: '수정된 제목입니다.',
+    example: '생성할 피드(게시글) 제목.',
   })
   @IsNotEmpty({ message: '피드(게시글) 제목은 비어있을 수 없습니다.' })
   title: string;
 
   @ApiProperty({
     description: '피드(게시글) 내용',
-    example: '수정된 내용입니다.',
+    example: '생성할 피드(게시글) 내용.',
   })
   @IsNotEmpty({ message: '피드(게시글) 내용은 비어있을 수 없습니다.' })
   content: string;
