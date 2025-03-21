@@ -18,7 +18,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('유저')
-@Controller('api/v1/users')
+@Controller('api/v1/user')
 @UseInterceptors(ResponseInterceptor)
 @UseFilters(HttpExceptionFilter)
 export class UsersController {
