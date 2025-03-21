@@ -1,8 +1,8 @@
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
-import { Feed } from './feed.entity';
+import { Feed } from '../../feed/entity/feed.entity';
 
-@Entity({ name: 'likes' })
+@Entity({ name: 'like' })
 @Unique(['user', 'feed'])
 export class Like {
 
