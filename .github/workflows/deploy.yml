@@ -71,28 +71,12 @@ jobs:
           script: |
             docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-            docker stop ${{ env.CONTAINER_NAME }} || true
-            docker rm ${{ env.CONTAINER_NAME }} || true
-            docker image rm ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }} || true
+            cd /home/${{ secrets.REMOTE_USERNAME_DEV }}/teolmungchi
 
-            echo "${{ secrets.ENV }}" > /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env
+            echo "${{ secrets.ENV }}" > .env
 
-            docker run -d -p 3000:3000 \
-              --name ${{ env.CONTAINER_NAME }} \
-              --network tmc-network \
-              --env-file /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env \
-              --restart=unless-stopped \
-              --log-opt max-size=10m --log-opt max-file=3 \
-              ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }} || {
-                echo "Deployment failed, rolling back to latest image..."
-                docker run -d -p 3000:3000 \
-                  --name ${{ env.CONTAINER_NAME }} \
-                  --network tmc-network \
-                  --env-file /home/${{ secrets.REMOTE_USERNAME_DEV }}/.env \
-                  --restart=unless-stopped \
-                  --log-opt max-size=10m --log-opt max-file=3 \
-                  ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:latest
-                exit 1
-              }
+            docker-compose down
+
+            docker-compose up -d --build
 
             docker image prune -f
