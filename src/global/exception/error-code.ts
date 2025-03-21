@@ -11,6 +11,7 @@ export enum ErrorCode {
   NOT_FOUND_USER = '사용자를 찾을 수 없습니다.',
   NOT_FOUND_CATS = '고양이를 찾을 수 없습니다.',
   NOT_FOUND_FEED = '피드(게시글)를 찾을 수 없습니다.',
+  NOT_FOUND_LIKE = '좋아요를 누르지 않았습니다.',
 
   // Invalid Argument Error
   MISSING_REQUEST_PARAMETER = '필수 요청 파라미터가 누락되었습니다.',
@@ -43,6 +44,9 @@ export enum ErrorCode {
   INTERNAL_SERVER_ERROR = '서버 내부 오류입니다.',
   UPLOAD_FILE_ERROR = '파일 업로드 URL 생성에 실패했습니다.',
   DOWNLOAD_FILE_ERROR = '파일 다운로드 URL 생성에 실패했습니다.',
+
+  // Already Exist
+  ALREADY_LIKED = '이미 좋아요를 눌렀습니다.',
 }
 
 export function getHttpStatus(errorCode: ErrorCode): HttpStatus {
