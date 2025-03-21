@@ -6,6 +6,7 @@ import { DatabaseModule } from './global/database/module/database.module';
 import { AuthModule } from './global/auth/module/auth.module';
 import { MinioModule } from './domain/s3/module/minio.module';
 import { FeedModule } from './domain/feed/module/feed.module';
+import { LikeModule } from './domain/like/module/like.module';
 
 dotenv.config();
 @Module({
@@ -15,6 +16,7 @@ dotenv.config();
     AuthModule,
     MinioModule,
     FeedModule,
+    LikeModule,
   ],
 })
 export class AppModule implements NestModule {
