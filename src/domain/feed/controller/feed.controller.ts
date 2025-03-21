@@ -19,7 +19,7 @@ import { CreateFeedDto } from '../dto/create-feed.dto';
 import { UpdateFeedDto } from '../dto/update-feed.dto';
 
 @ApiTags('피드(게시판)')
-@Controller('/api/v1/feed')
+@Controller('api/v1/feed')
 @UseInterceptors(ResponseInterceptor)
 @UseFilters(HttpExceptionFilter)
 export class FeedController {
@@ -31,6 +31,7 @@ export class FeedController {
   })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드(게시글) 생성 성공' })
+  @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Post()
   @UseGuards(JwtAuthGuard)
   async createFeed(
@@ -48,6 +49,7 @@ export class FeedController {
   })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드(게시글) 수정 완료' })
+  @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async updateFeed(
@@ -70,6 +72,7 @@ export class FeedController {
   })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드 조회 성공' })
+  @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async getFeed(
@@ -87,6 +90,7 @@ export class FeedController {
   })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '모든 피드(게시글) 조회 성공' })
+  @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Get()
   @UseGuards(JwtAuthGuard)
   async getFeeds(@Req() req): Promise<ResponseDto<any>> {
@@ -101,6 +105,7 @@ export class FeedController {
   })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드(게시글) 삭제 성공'})
+  @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async deleteFeed(

@@ -23,7 +23,7 @@ import { ErrorCode } from '../../exception/error-code';
 import { AuthLoginDto } from '../dto/auth-login.dto';
 
 @ApiTags('인증/인가')
-@Controller('api/v1')
+@Controller('api/v1/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -33,7 +33,7 @@ export class AuthController {
   @ApiOperation({ summary: '회원가입', description: '회원가입을 진행합니다.' })
   @ApiResponse({ status: 200, description: '회원가입에 성공하였습니다.' })
   @ApiResponse({ status: 400, description: '잘못된 요청 데이터' })
-  @Post('auth/sign-up')
+  @Post('sign-up')
   async signUp(
     @Body(new ValidationPipe({ transform: true })) authSignUpDto: AuthSignUpDto,
   ): Promise<ResponseDto<any>> {
@@ -44,7 +44,7 @@ export class AuthController {
   @ApiOperation({ summary: '로그인', description: '로그인을 진행합니다.' })
   @ApiResponse({ status: 200, description: '로그인에 성공하였습니다.' })
   @ApiResponse({ status: 401, description: '입력값이 올바르지 않습니다.' })
-  @Post('auth/login')
+  @Post('login')
   async login(
     @Body(new ValidationPipe({ transform: true })) authLoginDto: AuthLoginDto,
     @Res() res: Response,
@@ -61,7 +61,7 @@ export class AuthController {
     status: 401,
     description: 'JWT 토큰이 없거나 유효하지 않습니다.',
   })
-  @Post('auth/logout')
+  @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@Req() req: Request, @Res() res: Response): Promise<any> {
     if (!req.user) {
@@ -81,7 +81,7 @@ export class AuthController {
     status: 401,
     description: 'JWT 토큰이 없거나 유효하지 않습니다.',
   })
-  @Patch('auth/password')
+  @Patch('password')
   @UseGuards(JwtAuthGuard)
   async changePassword(
     @Req() req: Request,
@@ -108,7 +108,7 @@ export class AuthController {
     status: 401,
     description: '유효한 리프레시 토큰이 아닙니다.'
   })
-  @Post('auth/reissue')
+  @Post('reissue')
   async reissue(@Req() req: Request, @Res() res: Response): Promise<any> {
     // 헤더에서 리프레시 토큰을 읽어옵니다.
     const refreshToken = req.headers['x-refresh-token'];
