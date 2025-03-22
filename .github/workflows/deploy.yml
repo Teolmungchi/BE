@@ -55,7 +55,7 @@ jobs:
           tags: ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }},${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-#push test
+
   CD:
     needs: [CI]
     if: github.event_name == 'push'
@@ -75,8 +75,10 @@ jobs:
 
             echo "${{ secrets.ENV }}" > .env
 
+            docker pull ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }}
+
             docker-compose down
 
-            docker-compose up -d --build
+            docker-compose up -d
 
             docker image prune -f
