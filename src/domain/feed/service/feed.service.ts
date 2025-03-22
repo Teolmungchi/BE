@@ -24,19 +24,11 @@ export class FeedService {
     }
 
     const feed = new Feed();
-    feed.title = createFeedDto.title;
-    feed.content = createFeedDto.content;
-    feed.imageUrl = createFeedDto.imageUrl ? createFeedDto.imageUrl : '';
-    feed.lostDate = createFeedDto.lostDate;
-    feed.lostPlace = createFeedDto.lostPlace;
-    feed.placeFeature = createFeedDto.placeFeature;
-    feed.dogType = createFeedDto.dogType;
-    feed.dogAge = createFeedDto.dogAge;
-    feed.dogGender = createFeedDto.dogGender;
-    feed.dogColor = createFeedDto.dogColor;
-    feed.dogFeature = createFeedDto.dogFeature;
-
-    feed.author = { id: userId } as any;
+    Object.assign(feed, {
+      ...createFeedDto,
+      imageUrl: createFeedDto.imageUrl || '', // 기본값 설정
+      author: { id: userId } as any,
+    });
     return await this.feedRepository.save(feed);
   }
 
