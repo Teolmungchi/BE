@@ -27,6 +27,14 @@ export class FeedService {
     feed.title = createFeedDto.title;
     feed.content = createFeedDto.content;
     feed.imageUrl = createFeedDto.imageUrl ? createFeedDto.imageUrl : '';
+    feed.lostDate = createFeedDto.lostDate;
+    feed.lostPlace = createFeedDto.lostPlace;
+    feed.placeFeature = createFeedDto.placeFeature;
+    feed.dogType = createFeedDto.dogType;
+    feed.dogAge = createFeedDto.dogAge;
+    feed.dogGender = createFeedDto.dogGender;
+    feed.dogColor = createFeedDto.dogColor;
+    feed.dogFeature = createFeedDto.dogFeature;
 
     feed.author = { id: userId } as any;
     return await this.feedRepository.save(feed);
@@ -91,6 +99,30 @@ export class FeedService {
     }
     if(updateFeedDto.imageUrl !== undefined) {
       feed.imageUrl = updateFeedDto.imageUrl;
+    }
+    if(updateFeedDto.lostDate !== undefined) {
+      feed.lostDate = updateFeedDto.lostDate;
+    }
+    if(updateFeedDto.lostPlace !== undefined) {
+      feed.lostPlace = updateFeedDto.lostPlace;
+    }
+    if(updateFeedDto.placeFeature !== undefined) {
+      feed.placeFeature = updateFeedDto.placeFeature;
+    }
+    if(updateFeedDto.dogType !== undefined) {
+      feed.dogType = updateFeedDto.dogType;
+    }
+    if(updateFeedDto.dogAge !== undefined) {
+      feed.dogAge = updateFeedDto.dogAge;
+    }
+    if(updateFeedDto.dogGender !== undefined) {
+      feed.dogGender = updateFeedDto.dogGender;
+    }
+    if(updateFeedDto.dogColor !== undefined) {
+      feed.dogColor = updateFeedDto.dogColor;
+    }
+    if(updateFeedDto.dogFeature !== undefined) {
+      feed.dogFeature = updateFeedDto.dogFeature;
     }
     return await this.feedRepository.save(feed);
   }
