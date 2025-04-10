@@ -6,7 +6,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['verbose'],
+  });
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.use((req, res, next) => {
@@ -18,14 +20,21 @@ async function bootstrap() {
 
   // Swagger 설정
   const config = new DocumentBuilder()
-    .setTitle('털뭉치 API')
-    .setDescription('털뭉치 Documentation')
+    .setTitle('셜록냥즈 API')
+    .setDescription('셜록냥즈 Documentation')
     .setVersion('1.0')
+    .addBasicAuth()
     .addBearerAuth()
-    .addServer('/api')
+    // .addServer('/api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    }
+  });
+
 
   await app.listen(3000);
 }

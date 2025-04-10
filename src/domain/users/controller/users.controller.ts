@@ -28,10 +28,10 @@ export class UsersController {
     summary: '유저 정보 조회',
     description: '로그인된 유저의 정보를 가져옵니다.',
   })
-  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '유저 정보 반환 성공' })
   @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Get()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async getUserInfo(@Req() req): Promise<ResponseDto<any>> {
     const userId = req.user.id;

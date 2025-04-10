@@ -32,9 +32,6 @@ export class FeedController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: '피드(게시글) 생성 성공' })
   @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
-  @ApiCreatedResponse({
-    description: '성공', type: CreateFeedDto,
-  })
   @Post()
   @UseGuards(JwtAuthGuard)
   async createFeed(
@@ -45,6 +42,7 @@ export class FeedController {
     const feed = await this.feedService.createFeed(userId, createFeedDto);
     return ResponseDto.ok(feed);
   }
+
   @ApiOperation({
     summary: '피드(게시글)을 수정합니다.',
     description: '피드(게시글)을 수정합니다.',
