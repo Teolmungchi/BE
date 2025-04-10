@@ -26,7 +26,7 @@ export class FeedService {
     const feed = new Feed();
     Object.assign(feed, {
       ...createFeedDto,
-      imageUrl: createFeedDto.imageUrl || '', // 기본값 설정
+      imageUrl: createFeedDto.imageUrl || '',
       author: { id: userId } as any,
     });
     return await this.feedRepository.save(feed);
@@ -83,39 +83,16 @@ export class FeedService {
     if(feed.author.id !== userId) {
       throw new CommonException(ErrorCode.ACCESS_DENIED);
     }
-    if (updateFeedDto.title !== undefined) {
-      feed.title = updateFeedDto.title;
-    }
-    if (updateFeedDto.content !== undefined) {
-      feed.content = updateFeedDto.content;
-    }
-    if(updateFeedDto.imageUrl !== undefined) {
-      feed.imageUrl = updateFeedDto.imageUrl;
-    }
-    if(updateFeedDto.lostDate !== undefined) {
-      feed.lostDate = updateFeedDto.lostDate;
-    }
-    if(updateFeedDto.lostPlace !== undefined) {
-      feed.lostPlace = updateFeedDto.lostPlace;
-    }
-    if(updateFeedDto.placeFeature !== undefined) {
-      feed.placeFeature = updateFeedDto.placeFeature;
-    }
-    if(updateFeedDto.dogType !== undefined) {
-      feed.dogType = updateFeedDto.dogType;
-    }
-    if(updateFeedDto.dogAge !== undefined) {
-      feed.dogAge = updateFeedDto.dogAge;
-    }
-    if(updateFeedDto.dogGender !== undefined) {
-      feed.dogGender = updateFeedDto.dogGender;
-    }
-    if(updateFeedDto.dogColor !== undefined) {
-      feed.dogColor = updateFeedDto.dogColor;
-    }
-    if(updateFeedDto.dogFeature !== undefined) {
-      feed.dogFeature = updateFeedDto.dogFeature;
-    }
+
+    const updatedFields = Object.entries(updateFeedDto).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as Partial<Feed>)
+
+    Object.assign(feed, updatedFields);
+
     return await this.feedRepository.save(feed);
   }
 

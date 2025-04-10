@@ -17,7 +17,7 @@ import { JwtTokenDto } from '../dto/jwt-token.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ResponseDto } from '../../exception/dto/response.dto';
 import { ChangePasswordDto } from '../dto/change-password.to';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommonException } from '../../exception/common-exception';
 import { ErrorCode } from '../../exception/error-code';
 import { AuthLoginDto } from '../dto/auth-login.dto';
@@ -62,6 +62,7 @@ export class AuthController {
     description: 'JWT 토큰이 없거나 유효하지 않습니다.',
   })
   @Post('logout')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async logout(@Req() req: Request, @Res() res: Response): Promise<any> {
     if (!req.user) {
@@ -82,6 +83,7 @@ export class AuthController {
     description: 'JWT 토큰이 없거나 유효하지 않습니다.',
   })
   @Patch('password')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async changePassword(
     @Req() req: Request,
@@ -109,6 +111,8 @@ export class AuthController {
     description: '유효한 리프레시 토큰이 아닙니다.'
   })
   @Post('reissue')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   async reissue(@Req() req: Request, @Res() res: Response): Promise<any> {
     // 헤더에서 리프레시 토큰을 읽어옵니다.
     const refreshToken = req.headers['x-refresh-token'];

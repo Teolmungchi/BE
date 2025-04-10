@@ -26,9 +26,9 @@ export class MinioController {
   constructor(private readonly minioService: MinioService) {}
 
   @ApiOperation({ summary: 'S3 Presigned URL (업로드)' })
-  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Presigned URL 반환 성공' })
   @Get('upload')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async getUploadUrl(): Promise<ResponseDto<any>> {
     const url = await this.minioService.getPresignedUrlForUpload();
@@ -38,6 +38,8 @@ export class MinioController {
 
   @ApiOperation({ summary: 'S3 Presigned URL (다운로드)' })
   @Get('download/:fileName')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async getDownloadUrl(
     @Param('fileName') fileName: string,
   ): Promise<ResponseDto<any>> {
