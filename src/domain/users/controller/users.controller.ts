@@ -47,6 +47,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: '잘못된 요청 데이터' })
   @ApiResponse({ status: 401, description: 'JWT 토큰이 없거나 유효하지 않음' })
   @Put()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateUserInfo(
     @Req() req,
