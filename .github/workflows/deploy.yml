@@ -79,6 +79,7 @@ jobs:
 
             docker-compose down
 
+#            docker image prune -f
+            docker rmi ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }}
+                    
             docker-compose up -d
-
-            docker image prune -f
