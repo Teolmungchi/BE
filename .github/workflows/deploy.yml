@@ -77,8 +77,8 @@ jobs:
 
             docker pull ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }}
 
+            export TAG=${{ github.run_number }}  # 최신 태그 설정
+            
             docker-compose down
-
-            docker rmi ${{ secrets.DOCKER_ID }}/${{ env.CONTAINER_NAME }}:${{ github.run_number }}
-                    
-            docker-compose up -d
+            
+            docker-compose up -d --pull always  # 항상 최신 이미지 pull
