@@ -17,7 +17,7 @@ import { JwtTokenDto } from '../dto/jwt-token.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ResponseDto } from '../../exception/dto/response.dto';
 import { ChangePasswordDto } from '../dto/change-password.to';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommonException } from '../../exception/common-exception';
 import { ErrorCode } from '../../exception/error-code';
 import { AuthLoginDto } from '../dto/auth-login.dto';
@@ -31,7 +31,17 @@ export class AuthController {
   ) {}
 
   @ApiOperation({ summary: '회원가입', description: '회원가입을 진행합니다.' })
-  @ApiResponse({ status: 200, description: '회원가입에 성공하였습니다.' })
+  @ApiResponse({
+    status: 200,
+    description: '회원가입에 성공하였습니다.',
+    schema: {
+      example: {
+        httpStatus: 201,
+        success: true,
+        data: null,
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: '잘못된 요청 데이터' })
   @Post('sign-up')
   async signUp(
@@ -42,21 +52,43 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: '로그인', description: '로그인을 진행합니다.' })
-  @ApiResponse({ status: 200, description: '로그인에 성공하였습니다.' })
+  @ApiResponse({
+    status: 200,
+    description: '로그인을 성공합니다.',
+    schema: {
+      example: {
+        success: true,
+        data: {
+          accessToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTc0NDM1MDA5MywiZXhwIjoxNzQ0MzUzNjkzfQ.UF5b8mCa5mnvL9WK3Igx0Fc5vWzcSSTXdUuceGRpCX0',
+          refreshToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTc0NDM1MDA5MywiZXhwIjoxNzQ1NTU5NjkzfQ.ErOsYgzWtnwwXzmSfNr4R7Uj6wg5kWabSdkL0kVVkzY',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 401, description: '입력값이 올바르지 않습니다.' })
   @Post('login')
   async login(
     @Body(new ValidationPipe({ transform: true })) authLoginDto: AuthLoginDto,
     @Res() res: Response,
   ): Promise<any> {
-    const jwtTokenDto: JwtTokenDto =
-      await this.authService.login(authLoginDto);
+    const jwtTokenDto: JwtTokenDto = await this.authService.login(authLoginDto);
     res.setHeader('x-refresh-token', jwtTokenDto.refreshToken);
     return res.json({ success: true, data: jwtTokenDto });
   }
 
   @ApiOperation({ summary: '로그아웃', description: '로그아웃을 진행합니다.' })
-  @ApiResponse({ status: 200, description: '로그아웃에 성공하였습니다.' })
+  @ApiResponse({
+    status: 200,
+    description: '로그아웃에 성공하였습니다.',
+    schema: {
+      example: {
+        success: true,
+        message: '로그아웃에 성공하였습니다.',
+      },
+    },
+  })
   @ApiResponse({
     status: 401,
     description: 'JWT 토큰이 없거나 유효하지 않습니다.',
@@ -77,10 +109,27 @@ export class AuthController {
     summary: '비밀번호 변경',
     description: '비밀번호 변경을 진행합니다.',
   })
-  @ApiResponse({ status: 200, description: '비밀번호 수정에 성공하였습니다.' })
+  @ApiResponse({
+    status: 200,
+    description: '비밀번호 수정에 성공하였습니다.',
+    schema: {
+      example: {
+        httpStatus: 200,
+        success: true,
+        data: null,
+      },
+    },
+  })
   @ApiResponse({
     status: 401,
-    description: 'JWT 토큰이 없거나 유효하지 않습니다.',
+    description: 'JWT 토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
   })
   @Patch('password')
   @ApiBearerAuth()
@@ -104,11 +153,29 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: '새로운 토쿤 발급에 성공하였습니다.',
+    description: '새로운 토큰 발급에 성공하였습니다.',
+    schema: {
+      example: {
+        success: true,
+        data: {
+          accessToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ0MzU2Mzk2fQ.Q61B_zYDQpZ92BmqyTdwvippd2kdx7iR3afpRkCoRxs',
+          refreshToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ1NTYyMzk2fQ.5keoNz8vEiqx65vk18eVVbHSHvFTDwianTVbAvFDWa8',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
-    description: '유효한 리프레시 토큰이 아닙니다.'
+    description: 'JWT 토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
   })
   @Post('reissue')
   @ApiBearerAuth()
