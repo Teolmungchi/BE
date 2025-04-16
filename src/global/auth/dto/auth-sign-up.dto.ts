@@ -1,18 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class AuthSignUpDto {
   @ApiProperty({
-    description: '사용자 아이디 (영문 소문자 또는 숫자)',
-    example: 'example1234',
+    description: '사용자 이메일 아이디',
+    example: 'sumin111@gachon.ac.kr',
   })
-  @IsNotEmpty({ message: '아이디는 null이 될 수 없습니다.' })
-  @IsString()
-  @Length(4, 20, { message: '아이디는 4~20자리로 입력해주세요.' })
-  @Matches(/^[a-z0-9]+$/, {
-    message: '아이디는 영문 소문자 또는 숫자로만 이루어져야 합니다.',
-  })
+  @IsNotEmpty({ message: '이메일 아이디는 null이 될 수 없습니다.' })
+  @IsEmail({}, { message: '유효한 이메일 형식이 아닙니다.' })
+  @Length(4, 50, { message: '이메일 아이디는 4~50자리로 입력해주세요.' })
   @Expose({ name: 'userId' })
   userId: string;
 
