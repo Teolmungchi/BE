@@ -33,16 +33,17 @@ export class UsersController {
     description: '유저 정보 반환 성공',
     schema: {
       example: {
-        httpStatus: 200,
-        success: true,
-        data: {
-          httpStatus: 200,
-          success: true,
-          data: {
-            id: 8,
-            name: '수민띵',
-          },
-        },
+        "httpStatus": 200,
+        "success": true,
+        "data": {
+          "httpStatus": 200,
+          "success": true,
+          "data": {
+            "id": 10,
+            "login_id": "sumin11@gachon.ac.kr",
+            "name": "괜찮아딩딩딩딩딩"
+          }
+        }
       },
     },
   })
@@ -90,9 +91,13 @@ export class UsersController {
     description: 'JWT 토큰이 없거나 유효하지 않음',
     schema: {
       example: {
-        success: false,
-        message: 'Unauthorized',
-        statusCode: 401,
+        "httpStatus": 200,
+        "success": true,
+        "data": {
+          "id": 10,
+          "login_id": "sumin11@gachon.ac.kr",
+          "name": "괜찮아딩딩딩딩딩"
+        }
       },
     },
   })
