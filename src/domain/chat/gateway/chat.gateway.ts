@@ -1,16 +1,16 @@
 import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
-  MessageBody,
   ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../service/chat.service';
-import { Logger, BadRequestException } from '@nestjs/common';
-import { validate, Validate } from 'class-validator';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { validate } from 'class-validator';
 import { AuthService } from '../../../global/auth/service/auth.service';
 import { JoinRoomDto } from '../dto/join-room.dto';
 import { SendMessageDto } from '../dto/send-message.dto';
@@ -50,8 +50,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.data.user = {
         ...payload,
         id: payload.userId,
-      }
-      this.logger.log(`연결 성공: ${client.id}, User: ${payload.sub || payload.id}`);
+      };
+      this.logger.log(
+        `연결 성공: ${client.id}, User: ${payload.sub || payload.id}`,
+      );
       client.emit('connectSuccess', { userId: payload.sub || payload.id });
     } catch (error) {
       this.logger.error(`인증 실패: ${client.id}: ${error.message}`);
@@ -74,7 +76,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinRoom')
-  async joinRoom(@MessageBody() data: JoinRoomDto, @ConnectedSocket() client: Socket) {
+  async joinRoom(
+    @MessageBody() data: JoinRoomDto,
+    @ConnectedSocket() client: Socket,
+  ) {
     const user = client.data.user;
     if (!user) {
       return client.emit('error', { message: 'Unauthorized' });
@@ -94,7 +99,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`chatRoom-user2:` + chatRoom.user2.id);
 
       if (chatRoom.user1.id !== user.id && chatRoom.user2.id !== user.id) {
-        return client.emit('error', { message: 'Not authorized for this chat room' });
+        return client.emit('error', {
+          message: 'Not authorized for this chat room',
+        });
       }
 
       client.join(`room_${data.chatRoomId}`);
@@ -106,7 +113,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendMessage')
-  async sendMessage(@MessageBody() data: SendMessageDto, @ConnectedSocket() client: Socket) {
+  async sendMessage(
+    @MessageBody() data: SendMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
     const user = client.data.user;
     if (!user) {
       return client.emit('error', { message: 'Unauthorized' });
@@ -128,7 +138,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         chatRoomId: chatMessage.chatRoomId,
         createdAt: chatMessage.createdAt,
       });
-      this.logger.log(`Message sent in room ${data.chatRoomId} by user ${user.id}`);
+      this.logger.log(
+        `Message sent in room ${data.chatRoomId} by user ${user.id}`,
+      );
     } catch (error) {
       client.emit('error', { message: error.message });
     }
