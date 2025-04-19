@@ -1,4 +1,4 @@
-import { Injectable, UseFilters } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, UseFilters } from '@nestjs/common';
 import { HttpExceptionFilter } from '../../exception/filter/http-exception.filter';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../../domain/users/repository/user.repository';
@@ -13,6 +13,9 @@ import { AuthLoginDto } from '../dto/auth-login.dto';
 @Injectable()
 @UseFilters(HttpExceptionFilter)
 export class AuthService {
+
+  private readonly logger = new Logger('AuthService');
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
@@ -107,5 +110,38 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '14d' }); // refreshToken 14일 유효
 
     return { accessToken, refreshToken };
+  }
+
+  async parseBearerToken(rawToken: string | undefined, strict: boolean): Promise<any> {
+    this.logger.log(`Raw token: ${rawToken}`);
+    if (!rawToken) {
+      if (strict) {
+        throw new UnauthorizedException('No token provided');
+      }
+      return null;
+    }
+
+    const token = rawToken;
+
+    if (strict && (token.split('.').length !== 3)) {
+      throw new UnauthorizedException('Invalid JWT format');
+    }
+
+    try {
+      this.logger.log(`Verifying token with secret: ${process.env.JWT_SECRET}`);
+      const startTime = Date.now();
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET || 'your-jwt-secret',
+      });
+      this.logger.log(`Token verification took ${Date.now() - startTime}ms`);
+      this.logger.log(`Token payload: ${JSON.stringify(payload)}`);
+      return payload;
+    } catch (error) {
+      this.logger.error(`Token verification failed: ${error.message}`);
+      if (strict) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+      return null;
+    }
   }
 }

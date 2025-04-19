@@ -1,10 +1,11 @@
 import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
 import { Feed } from '../../feed/entity/feed.entity';
+import { BaseTime } from '../../../global/utils/basetime.entity';
 
-@Entity({ name: 'like' })
+@Entity({ name: 'likes' })
 @Unique(['user', 'feed'])
-export class Like {
+export class Like extends BaseTime{
 
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,7 +15,4 @@ export class Like {
 
   @ManyToOne(() => Feed, (feed) => feed.id, { onDelete: 'CASCADE' })
   feed: Feed;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

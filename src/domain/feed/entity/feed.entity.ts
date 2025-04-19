@@ -1,8 +1,9 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
+import { BaseTime } from '../../../global/utils/basetime.entity';
 
 @Entity()
-export class Feed {
+export class Feed extends BaseTime{
   @PrimaryGeneratedColumn({ name: 'feed_id' })
   id: number;
 
@@ -46,10 +47,6 @@ export class Feed {
   @Column({ name: 'dog_feature', type: 'text', charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci', nullable: true })
   dogFeature: string;
 
-
   @Column({ name: 'likes_count', type: 'int', default: 0 })
   likesCount: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
