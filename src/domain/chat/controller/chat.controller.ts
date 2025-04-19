@@ -31,7 +31,7 @@ export class ChatController {
             '$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG',
           isLogin: true,
           refreshToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDQ5NjAwNTYsImV4cCI6MTc0NjE2OTY1Nn0.9A42Tpo_LraaSDe7k--DUidqFTgGbE5td4COPzPfKzs',
+            'eyJhbGciOiJIUzImV4cCI6MTc0NjE2OTY1Nn0TgGbE5td4COPzPfKzs',
           name: '수민띵',
         },
         user2: {

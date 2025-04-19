@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ChatMessage } from '../schema/chat-message.schema';
@@ -11,6 +7,8 @@ import { User } from '../../users/entity/user.entity';
 import { CreateChatRoomDto } from '../dto/create-chat-room.dto';
 import { ChatRoom } from '../entity/chat-room.entity';
 import { SendMessageDto } from '../dto/send-message.dto';
+import { CommonException } from '../../../global/exception/common-exception';
+import { ErrorCode } from '../../../global/exception/error-code';
 
 @Injectable()
 export class ChatService {
@@ -21,7 +19,7 @@ export class ChatService {
 
   async createChatRoom(user1: User, dto: CreateChatRoomDto): Promise<ChatRoom> {
     if (user1.id === dto.user2Id) {
-      throw new BadRequestException('동일한 유저입니다.');
+      throw new CommonException(ErrorCode.SAME_USER);
     }
 
     let chatRoom = await this.chatRoomRepository.findByUsers(
@@ -45,7 +43,7 @@ export class ChatService {
       relations: ['user1', 'user2'],
     });
     if (!chatRoom) {
-      throw new NotFoundException('채팅방을 찾지 못했습니다.');
+      throw new CommonException(ErrorCode.NOT_FOUND_CHAT_ROOM);
     }
     return chatRoom;
   }
@@ -63,7 +61,7 @@ export class ChatService {
   ): Promise<ChatMessage> {
     const chatRoom = await this.getChatRoom(dto.chatRoomId);
     if (chatRoom.user1Id !== senderId && chatRoom.user2Id !== senderId) {
-      throw new BadRequestException('채팅방에 없습니다.');
+      throw new CommonException(ErrorCode.NOT_IN_CHAT_ROOM);
     }
     const receiverId =
       chatRoom.user1Id === senderId ? chatRoom.user2Id : chatRoom.user1Id;

@@ -16,7 +16,7 @@ import { AuthSignUpDto } from '../dto/auth-sign-up.dto';
 import { JwtTokenDto } from '../dto/jwt-token.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ResponseDto } from '../../exception/dto/response.dto';
-import { ChangePasswordDto } from '../dto/change-password.to';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommonException } from '../../exception/common-exception';
 import { ErrorCode } from '../../exception/error-code';
@@ -60,9 +60,9 @@ export class AuthController {
         success: true,
         data: {
           accessToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTc0NDM1MDA5MywiZXhwIjoxNzQ0MzUzNjkzfQ.UF5b8mCa5mnvL9WK3Igx0Fc5vWzcSSTXdUuceGRpCX0',
+            'eyJhbGcywiZXhwIjoxNzQ0MzUzNjkzfQ.UF5b8mCa5mnvL9WK3Igx0Fc5vWzcSSTXdUuceGRpCX0',
           refreshToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTc0NDM1MDA5MywiZXhwIjoxNzQ1NTU5NjkzfQ.ErOsYgzWtnwwXzmSfNr4R7Uj6wg5kWabSdkL0kVVkzY',
+            'eyJhbGciTc0NDM1MDA5MywiZXhwIjoxNzQ1NTU5NjkzfQ.ErOsYgzWtnwwXzmSfNr4R7Uj6wg5kWabSdkL0kVVkzY',
         },
       },
     },
@@ -159,9 +159,9 @@ export class AuthController {
         success: true,
         data: {
           accessToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ0MzU2Mzk2fQ.Q61B_zYDQpZ92BmqyTdwvippd2kdx7iR3afpRkCoRxs',
+            'eyJhbGciOiJIUzIiZXhwIjoxNzQ0MzU2Mzk2fQ.Q61B_zYDQpZ92BmqyTdwvippd2kdx7iR3afpRkCoRxs',
           refreshToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ1NTYyMzk2fQ.5keoNz8vEiqx65vk18eVVbHSHvFTDwianTVbAvFDWa8',
+            'eyJhbGciOiJIUzI1NiIswiZXhwIjoxNzQ1NTYyMzk2fQ.5keoNz8vEiqx65vk18eVVbHSHvFTDwianTVbAvFDWa8',
         },
       },
     },
