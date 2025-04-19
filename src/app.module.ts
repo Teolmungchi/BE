@@ -7,7 +7,7 @@ import { AuthModule } from './global/auth/module/auth.module';
 import { MinioModule } from './domain/s3/module/minio.module';
 import { FeedModule } from './domain/feed/module/feed.module';
 import { LikeModule } from './domain/like/module/like.module';
-import { ChatModule } from './domain/chat/chat.module';
+import { ChatModule } from './domain/chat/module/chat.module';
 
 dotenv.config();
 @Module({
