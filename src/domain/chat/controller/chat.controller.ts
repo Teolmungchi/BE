@@ -61,70 +61,38 @@ export class ChatController {
   @ApiOperation({ summary: '유저의 모든 채팅방 조회' })
   @ApiResponse({
     status: 200,
-    description: '모든 채팅방 조회',
+    description: '모든 채팅방 조회, 메시지를 받은 유저의 안 읽은 횟수, 몇 분 전에 메시지가 왔는지 확인 가능',
     schema: {
       example: [
         {
-          createdAt: '2025-04-17T02:50:26.000Z',
-          updatedAt: '2025-04-17T02:50:26.000Z',
-          id: 3,
-          user1Id: 11,
-          user2Id: 8,
-          user1: {
-            createdAt: '2025-04-15T20:16:52.000Z',
-            updatedAt: '2025-04-17T22:07:36.000Z',
-            id: 11,
-            serialId: 'sumin11@gachon.ac.kr',
-            password:
-              '$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG',
-            isLogin: true,
-            refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInqFTgGbE5td4COPzPfKzs',
-            name: '수민띵',
+          "id": 3,
+          "user1Id": 11,
+          "user2Id": 14,
+          "user1": {
+            "createdAt": "2025-04-15T20:16:52.000Z",
+            "updatedAt": "2025-04-18T22:06:44.000Z",
+            "id": 11,
+            "serialId": "sumin11@gachon.ac.kr",
+            "password": "$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG",
+            "isLogin": true,
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDUwNDY0MDQsImV4cCI6MTc0NjI1NjAwNH0.ytionyZzyHq8KkcIWsf_m9tSl3lMPv_7jggVWiZbcwM",
+            "name": "수민띵"
           },
-          user2: {
-            createdAt: '2025-04-10T21:12:14.000Z',
-            updatedAt: '2025-04-15T20:13:08.000Z',
-            id: 8,
-            serialId: 'sumin2201',
-            password:
-              '$2b$10$pPmBqYQnUu8.dVamgB6N9O19HiVSrD/pzFNJx22a1sVz0GFZ.mOMa',
-            isLogin: true,
-            refreshToken:
-              'eyJhjoxNzQ1OTg5OTg4fQ.3Pa8DzRRgeAe2OFZeR_5M07SGT0e7X0',
-            name: '괜찮아딩딩딩딩딩',
+          "user2": {
+            "createdAt": "2025-04-18T22:06:11.000Z",
+            "updatedAt": "2025-04-18T22:07:38.000Z",
+            "id": 14,
+            "serialId": "sumin111@gachon.ac.kr",
+            "password": "$2b$10$xNdaDBUlmAbcpeabPz5uNOgP4YdfZgRPhrszjkKnPt3X0I9MOW0b6",
+            "isLogin": true,
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJpYXQiOjE3NDUwNDY0NTgsImV4cCI6MTc0NjI1NjA1OH0.5d3t--D1_UFhkLKL7iNTYkaQDBjfIs7KYwNyHXdKInk",
+            "name": "수민띵"
           },
-        },
-        {
-          createdAt: '2025-04-17T22:08:27.000Z',
-          updatedAt: '2025-04-17T22:08:27.000Z',
-          id: 4,
-          user1Id: 11,
-          user2Id: 12,
-          user1: {
-            createdAt: '2025-04-15T20:16:52.000Z',
-            updatedAt: '2025-04-17T22:07:36.000Z',
-            id: 11,
-            serialId: 'sumin11@gachon.ac.kr',
-            password:
-              '$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG',
-            isLogin: true,
-            refreshToken:
-              'eyJhbc0NjE2OTY1aaSDe7k--DUidqFTgGbE5td4COPzPfKzs',
-            name: '수민띵',
-          },
-          user2: {
-            createdAt: '2025-04-17T21:12:10.000Z',
-            updatedAt: '2025-04-17T21:12:10.000Z',
-            id: 12,
-            serialId: 'sonsumin11@naver.com',
-            password:
-              '$2b$10$qB4Qto5vCIGPs8lgHw.Vlu4RQfektmHd9T0wQwMoN5msBgM1BAG7u',
-            isLogin: false,
-            refreshToken: null,
-            name: '괜찮아띵띵',
-          },
-        },
+          "unreadCount": 3,
+          "lastMessage": "바이바이",
+          "lastMessageAt": "2025-04-19T07:07:32.000Z",
+          "lastMessageAgo": "2분 전"
+        }
       ],
     },
   })
@@ -171,5 +139,20 @@ export class ChatController {
     @Query('limit') limit: number = 50,
   ): Promise<ChatMessage[]> {
     return this.chatService.getMessages(chatRoomId, limit);
+  }
+
+  @ApiOperation({ summary: '채팅방 메시지 읽음 처리' })
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 메시지 읽기',
+    schema: {example:{
+      }
+    },
+  })
+  @Post('room/:id/read')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async readChatRoom(@Req() req, @Param('id') chatRoomId: number) {
+    return this.chatService.readChatRoom(req.user.id, chatRoomId);
   }
 }
