@@ -79,7 +79,7 @@ export class ChatController {
               '$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG',
             isLogin: true,
             refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDQ5NjAwNTYsImV4cCI6MTc0NjE2OTY1Nn0.9A42Tpo_LraaSDe7k--DUidqFTgGbE5td4COPzPfKzs',
+              'eyJhbGciOiJIUzI1NiIsInqFTgGbE5td4COPzPfKzs',
             name: '수민띵',
           },
           user2: {
@@ -91,7 +91,7 @@ export class ChatController {
               '$2b$10$pPmBqYQnUu8.dVamgB6N9O19HiVSrD/pzFNJx22a1sVz0GFZ.mOMa',
             isLogin: true,
             refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDc4MDM4OCwiZXhwIjoxNzQ1OTg5OTg4fQ.3Pa8DzRRgeAe2OFZeR_5M0vbhLWbUF9W8f7SGT0e7X0',
+              'eyJhjoxNzQ1OTg5OTg4fQ.3Pa8DzRRgeAe2OFZeR_5M07SGT0e7X0',
             name: '괜찮아딩딩딩딩딩',
           },
         },
@@ -110,7 +110,7 @@ export class ChatController {
               '$2b$10$/NES39Bi/naW4C4UapWCRu13nxtC8NETIDgD.fCmCr/4FGwwFKvaG',
             isLogin: true,
             refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDQ5NjAwNTYsImV4cCI6MTc0NjE2OTY1Nn0.9A42Tpo_LraaSDe7k--DUidqFTgGbE5td4COPzPfKzs',
+              'eyJhbc0NjE2OTY1aaSDe7k--DUidqFTgGbE5td4COPzPfKzs',
             name: '수민띵',
           },
           user2: {
