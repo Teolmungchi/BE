@@ -6,7 +6,7 @@ import { ChatRoom } from '../entity/chat-room.entity';
 import { JwtAuthGuard } from '../../../global/common/guards/jwt-auth.guard';
 import { ChatMessage } from '../schema/chat-message.schema';
 
-@ApiTags('chat')
+@ApiTags('채팅')
 @Controller('api/v1/chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
