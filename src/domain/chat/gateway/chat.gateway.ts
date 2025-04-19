@@ -37,7 +37,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     try {
       const rawHeader = client.handshake.headers.authorization;
-      this.logger.log(`Raw authorization header: ${rawHeader}`);
       const token =
         client.handshake.query.token ||
         client.handshake.headers.authorization?.replace('Bearer ', '') ||

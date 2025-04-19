@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException, UseFilters } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  UseFilters,
+} from '@nestjs/common';
 import { HttpExceptionFilter } from '../../exception/filter/http-exception.filter';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../../domain/users/repository/user.repository';
@@ -6,14 +11,13 @@ import { CommonException } from '../../exception/common-exception';
 import { ErrorCode } from '../../exception/error-code';
 import { AuthSignUpDto } from '../dto/auth-sign-up.dto';
 import { JwtTokenDto } from '../dto/jwt-token.dto';
-import { ChangePasswordDto } from '../dto/change-password.to';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { AuthLoginDto } from '../dto/auth-login.dto';
 
 @Injectable()
 @UseFilters(HttpExceptionFilter)
 export class AuthService {
-
   private readonly logger = new Logger('AuthService');
 
   constructor(
@@ -112,19 +116,22 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async parseBearerToken(rawToken: string | undefined, strict: boolean): Promise<any> {
+  async parseBearerToken(
+    rawToken: string | undefined,
+    strict: boolean,
+  ): Promise<any> {
     this.logger.log(`Raw token: ${rawToken}`);
     if (!rawToken) {
       if (strict) {
-        throw new UnauthorizedException('No token provided');
+        throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
       }
       return null;
     }
 
     const token = rawToken;
 
-    if (strict && (token.split('.').length !== 3)) {
-      throw new UnauthorizedException('Invalid JWT format');
+    if (strict && token.split('.').length !== 3) {
+      throw new CommonException(ErrorCode.TOKEN_MALFORMED_ERROR);
     }
 
     try {
@@ -139,7 +146,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Token verification failed: ${error.message}`);
       if (strict) {
-        throw new UnauthorizedException('Invalid or expired token');
+        throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
       }
       return null;
     }
