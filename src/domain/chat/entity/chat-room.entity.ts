@@ -18,4 +18,16 @@ export class ChatRoom extends BaseTime {
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user2: User;
+
+  @Column({ default: 0 })
+  user1UnreadCount: number;
+
+  @Column({ default: 0 })
+  user2UnreadCount: number;
+
+  @Column({ nullable: true , charset: 'utf8mb4'})
+  lastMessage: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastMessageAt: Date;
 }

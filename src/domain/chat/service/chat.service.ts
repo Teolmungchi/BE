@@ -48,11 +48,23 @@ export class ChatService {
     return chatRoom;
   }
 
-  async getChatRoomsForUser(userId: number): Promise<ChatRoom[]> {
-    return this.chatRoomRepository.find({
+  async getChatRoomsForUser(userId: number): Promise<any[]> {
+    const rooms = await this.chatRoomRepository.find({
       where: [{ user1Id: userId }, { user2Id: userId }],
       relations: ['user1', 'user2'],
     });
+    return rooms.map((room) => ({
+      id: room.id,
+      user1Id: room.user1Id,
+      user2Id: room.user2Id,
+      user1: room.user1,
+      user2: room.user2,
+      unreadCount:
+        room.user1Id === userId ? room.user1UnreadCount : room.user2UnreadCount,
+      lastMessage: room.lastMessage,
+      lastMessageAt: room.lastMessageAt,
+      lastMessageAgo: room.lastMessageAt ? getTimeAgoString(room.lastMessageAt) : null,
+    }));
   }
 
   async createMessage(
@@ -73,7 +85,18 @@ export class ChatService {
       chatRoomId: dto.chatRoomId.toString(),
       createdAt: new Date(),
     });
-    return chatMessage.save();
+    await chatMessage.save();
+
+    if (senderId === chatRoom.user1Id) {
+      chatRoom.user2UnreadCount += 1;
+    } else {
+      chatRoom.user1UnreadCount += 1;
+    }
+    chatRoom.lastMessage = dto.message;
+    chatRoom.lastMessageAt = new Date();
+    await this.chatRoomRepository.save(chatRoom);
+
+    return chatMessage;
   }
 
   async getMessages(
@@ -85,5 +108,35 @@ export class ChatService {
       .sort({ createdAt: -1 })
       .limit(limit)
       .exec();
+  }
+
+  async readChatRoom(userId: number, chatRoomId: number): Promise<void> {
+    const chatRoom = await this.getChatRoom(chatRoomId);
+    if (chatRoom.user1Id === userId) {
+      chatRoom.user1UnreadCount = 0;
+    } else if (chatRoom.user2Id === userId) {
+      chatRoom.user2UnreadCount = 0;
+    }
+    await this.chatRoomRepository.save(chatRoom);
+  }
+
+}
+function getTimeAgoString(lastMessageAt: Date) : string {
+  const now = new Date();
+  const diffMs = now.getTime() - new Date(lastMessageAt).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+
+  if (minutes < 1) {
+    return '1분 전 미만';
+  } else if (minutes < 60) {
+    return `${minutes}분 전`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours}시간 전`;
+    } else {
+      const days = Math.floor(hours / 24);
+      return `${days}일 전`;
+    }
   }
 }
