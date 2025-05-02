@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTime } from '../../../global/utils/basetime.entity';
+import { Role } from './role.enum';
 
 @Entity({ name: 'users' })
 export class User extends BaseTime {
@@ -14,6 +15,9 @@ export class User extends BaseTime {
 
   @Column({ name: 'is_login', type: 'boolean', default: false })
   isLogin: boolean;
+
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
   @Column({
     name: 'refresh_token',
