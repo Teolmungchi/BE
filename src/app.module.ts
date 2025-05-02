@@ -8,6 +8,7 @@ import { MinioModule } from './domain/s3/module/minio.module';
 import { FeedModule } from './domain/feed/module/feed.module';
 import { LikeModule } from './domain/like/module/like.module';
 import { ChatModule } from './domain/chat/module/chat.module';
+import { AdminModule } from './domain/admin/admin.module';
 
 dotenv.config();
 @Module({
@@ -19,6 +20,7 @@ dotenv.config();
     FeedModule,
     LikeModule,
     ChatModule,
+    AdminModule,
   ],
 })
 export class AppModule implements NestModule {
