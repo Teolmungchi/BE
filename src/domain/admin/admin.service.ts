@@ -4,23 +4,24 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+
+  getStats() {
+    return Promise.resolve(undefined);
   }
 
-  findAll() {
-    return `This action returns all admin`;
+  getUserActivity(startDate: string, endDate: string) {
+    return Promise.resolve(undefined);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  getMatch(month: string) {
+    return Promise.resolve(undefined);
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  getRecentAnimals() {
+    return Promise.resolve(undefined);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+  getDashboard() {
+    return Promise.resolve(undefined);
   }
 }
