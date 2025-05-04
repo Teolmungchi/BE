@@ -13,6 +13,7 @@ export enum ErrorCode {
   NOT_FOUND_FEED = '피드(게시글)를 찾을 수 없습니다.',
   NOT_FOUND_LIKE = '좋아요를 누르지 않았습니다.',
   NOT_FOUND_CHAT_ROOM = '채팅방을 찾지 못했습니다.',
+  NOT_FOUND_DATA = '데이터를 찾지 못했습니다.',
 
   // Invalid Argument Error
   MISSING_REQUEST_PARAMETER = '필수 요청 파라미터가 누락되었습니다.',
