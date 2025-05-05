@@ -12,6 +12,7 @@ import { DashboardStatsDto } from '../dto/dashboard-stats.dto';
 import { UserActivityStatDto } from '../dto/user-activity-stat.dto';
 import { MatchingStatDto } from '../dto/matching-stat.dto';
 import { RecentAnimalDto } from '../dto/recent-animal.dto';
+import { UserListDto } from '../dto/user-list.dto';
 
 @ApiTags('관리자')
 @ApiBearerAuth()
@@ -45,8 +46,14 @@ export class AdminController {
   // }
 
   @Get('recent')
-  @ApiOperation({ summary: '최근 등록 동물', description: '가장 최근 등록된 동물 5개 반환' })
+  @ApiOperation({ summary: '최근 등록 동물', description: '가장 최근 등록된 동물 5개 ' })
   async getRecentAnimals(): Promise<RecentAnimalDto[]> {
     return this.adminService.getRecentAnimals();
+  }
+
+  @Get('users')
+  @ApiOperation({ summary: '유저 리스트', description: '유저 정보 리스트 ' })
+  async getUserList(): Promise<UserListDto[]> {
+    return this.adminService.getUserList();
   }
 }
