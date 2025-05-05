@@ -37,12 +37,12 @@ export class AdminController {
     return this.adminService.getUserActivity(startDate, endDate);
   }
 
-  @Get('matching')
-  @ApiOperation({ summary: '매칭 통계', description: '월별 매칭 성공/실패 건수 제공' })
-  @ApiQuery({ name: 'month', required: true, description: 'YYYY-MM 형식의 월' })
-  async getMatchingStats(@Query('month') month: string): Promise<MatchingStatDto> {
-    return this.adminService.getMatch(month);
-  }
+  // @Get('matching')
+  // @ApiOperation({ summary: '매칭 통계', description: '월별 매칭 성공/실패 건수 제공' })
+  // @ApiQuery({ name: 'month', required: true, description: 'YYYY-MM 형식의 월' })
+  // async getMatchingStats(@Query('month') month: string): Promise<MatchingStatDto> {
+  //   return this.adminService.getMatch(month);
+  // }
 
   @Get('recent')
   @ApiOperation({ summary: '최근 등록 동물', description: '가장 최근 등록된 동물 5개 반환' })
