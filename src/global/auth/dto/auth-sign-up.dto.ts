@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import { Expose } from 'class-transformer';
+import { Role } from '../../../domain/users/entity/role.enum';
 
 export class AuthSignUpDto {
   @ApiProperty({
@@ -37,4 +38,13 @@ export class AuthSignUpDto {
   })
   @Expose({ name: 'name' })
   name: string;
+
+  // @ApiProperty({
+  //   description: '권한',
+  //   example: '유저권한',
+  //   enum: Role,
+  // })
+  // @IsNotEmpty({ message: '권한은 null이 될 수 없습니다. ' })
+  // @IsEnum({ message: '권한은 User 또는 Admin이어야 합니다.'})
+  // role: Role;
 }

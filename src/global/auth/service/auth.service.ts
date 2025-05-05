@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  UnauthorizedException,
-  UseFilters,
-} from '@nestjs/common';
+import { Injectable, Logger, UseFilters } from '@nestjs/common';
 import { HttpExceptionFilter } from '../../exception/filter/http-exception.filter';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../../domain/users/repository/user.repository';
@@ -14,6 +9,7 @@ import { JwtTokenDto } from '../dto/jwt-token.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { AuthLoginDto } from '../dto/auth-login.dto';
+import { Role } from '../../../domain/users/entity/role.enum';
 
 @Injectable()
 @UseFilters(HttpExceptionFilter)
@@ -31,6 +27,7 @@ export class AuthService {
       serialId: authSignUpDto.userId,
       password: hashedPassword,
       name: authSignUpDto.name,
+      role: Role.USER,
     });
   }
 
