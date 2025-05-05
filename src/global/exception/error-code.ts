@@ -46,6 +46,7 @@ export enum ErrorCode {
   INTERNAL_SERVER_ERROR = '서버 내부 오류입니다.',
   UPLOAD_FILE_ERROR = '파일 업로드 URL 생성에 실패했습니다.',
   DOWNLOAD_FILE_ERROR = '파일 다운로드 URL 생성에 실패했습니다.',
+  DATABASE_QUERY_FAILED = '데이터베이스 쿼리 실패',
 
   // Already Exist
   ALREADY_LIKED = '이미 좋아요를 눌렀습니다.',
