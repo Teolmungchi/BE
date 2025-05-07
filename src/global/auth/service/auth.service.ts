@@ -107,7 +107,7 @@ export class AuthService {
 
   private generateTokens(userId: number): JwtTokenDto {
     const payload = { userId };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' }); // accessToken 1시간 유효
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // accessToken 1시간 유효
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '14d' }); // refreshToken 14일 유효
 
     return { accessToken, refreshToken };
