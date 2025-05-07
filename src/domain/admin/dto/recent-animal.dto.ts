@@ -11,6 +11,6 @@ export class RecentAnimalDto {
   image: string;
   user: {
     name: string;
-    profileImage?: string;
+    // profileImage?: string;
   };
 }
