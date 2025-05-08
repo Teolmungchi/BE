@@ -93,7 +93,7 @@ export class AdminService {
       breed: feed.dogFeature || 'unknown',
       location: feed.lostPlace || '',
       date: feed.lostDate ? new Date(feed.lostDate).toISOString().slice(0, 10) : '',
-      image: feed.imageUrl,
+      image: feed.fileName,
       user: {
         name: feed.author?.name,
       },

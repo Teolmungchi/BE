@@ -26,7 +26,7 @@ export class FeedService {
     const feed = new Feed();
     Object.assign(feed, {
       ...createFeedDto,
-      imageUrl: createFeedDto.imageUrl || '',
+      fileName: createFeedDto.fileName || '',
       author: { id: userId } as any,
     });
     return await this.feedRepository.save(feed);

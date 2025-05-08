@@ -16,8 +16,8 @@ export class Feed extends BaseTime{
   @Column({ name: 'content', type: 'text', charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci' })
   content: string;
 
-  @Column({ name: 'image_url', type: 'varchar', length: 255 })
-  imageUrl: string;
+  @Column({ name: 'file_name', type: 'varchar', length: 255 })
+  fileName: string;
 
   @Column({ name: 'lost_date', type: 'date', nullable: true })
   lostDate: Date;

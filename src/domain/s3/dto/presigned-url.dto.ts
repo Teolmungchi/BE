@@ -6,10 +6,14 @@ export class PresignedUrlDto {
     description: 'Presigned URL입니다.',
   })
   url: string;
+  fileName: string;
+  expiration: number; // 초 단위
 
-  static of(url: string): PresignedUrlDto {
+  static of(data: { url: string; fileName: string; expiration: number }): PresignedUrlDto {
     const dto = new PresignedUrlDto();
-    dto.url = url;
+    dto.url = data.url;
+    dto.fileName = data.fileName;
+    dto.expiration = data.expiration;
     return dto;
   }
 }
