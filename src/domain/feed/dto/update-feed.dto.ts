@@ -19,12 +19,12 @@ export class UpdateFeedDto {
   content: string;
 
   @ApiProperty({
-    description: '이미지 URL (presigned URL로 업로드 후 얻은 값)',
-    example: 'https://minio.example.com/bucket/1616161616_abcd',
+    description: '이미지 fileName ',
+    example: '1616161616_abcd',
     required: false,
   })
   @IsOptional()
-  imageUrl?: string;
+  fileName?: string;
 
   @ApiProperty({
     description: '잃어버린 날짜',

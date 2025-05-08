@@ -22,7 +22,7 @@ export class CreateFeedDto {
     example: 'https://minio.example.com/bucket/1616161616_abcd',
   })
   @IsNotEmpty({ message: '사진은 한 장 이상 올리세요'})
-  imageUrl?: string;
+  fileName?: string;
 
   @ApiProperty({
     description: '잃어버린 날짜',
