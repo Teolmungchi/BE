@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  Param,
+  Param, Query,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -17,6 +17,7 @@ import { JwtAuthGuard } from '../../../global/common/guards/jwt-auth.guard';
 import { ResponseInterceptor } from '../../../global/common/interceptor/response.interceptor';
 import { HttpExceptionFilter } from '../../../global/exception/filter/http-exception.filter';
 import { ResponseDto } from '../../../global/exception/dto/response.dto';
+import { PresignedUrlDto } from '../dto/presigned-url.dto';
 
 @ApiTags('S3 파일 업로드/다운로드')
 @Controller('api/v1/s3')
@@ -53,9 +54,10 @@ export class MinioController {
   @Get('upload')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getUploadUrl(): Promise<ResponseDto<any>> {
-    const url = await this.minioService.getPresignedUrlForUpload();
-
+  async getUploadUrl(
+    @Query('extension') extension?: string, // 확장자 파라미터 추가 (선택)
+  ): Promise<ResponseDto<PresignedUrlDto>> {
+    const url = await this.minioService.getPresignedUrlForUpload(extension);
     return ResponseDto.ok(url);
   }
 
@@ -88,9 +90,8 @@ export class MinioController {
   @ApiBearerAuth()
   async getDownloadUrl(
     @Param('fileName') fileName: string,
-  ): Promise<ResponseDto<any>> {
+  ): Promise<ResponseDto<PresignedUrlDto>> {
     const url = await this.minioService.getPresignedUrlForDownload(fileName);
-
     return ResponseDto.ok(url);
   }
 }
