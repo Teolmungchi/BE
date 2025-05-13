@@ -111,4 +111,15 @@ export class FeedService {
     }
     await this.feedRepository.remove(feed);
   }
+
+  async getAllFeeds(page: number, limit: number): Promise<{ feeds: Feed[]; total: number }> {
+    const [feeds, total] = await this.feedRepository.findAndCount({
+      relations: ['author'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return { feeds, total };
+  }
 }
