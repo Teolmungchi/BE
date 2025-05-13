@@ -81,7 +81,7 @@ export class AdminService {
   // 최근 등록 동물 5개
   async getRecentAnimals(): Promise<RecentAnimalDto[]> {
     const feeds = await this.feedRepository.find({
-      order: { createdAt: 'DESC' }, // createdAt이 entity에 매핑되어 있어야 함
+      order: { id: 'DESC' },
       take: 5,
       relations: ['author'],
     });
