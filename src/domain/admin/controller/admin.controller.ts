@@ -16,6 +16,8 @@ import { UserListDto } from '../dto/user-list.dto';
 import { ResponseDto } from '../../../global/exception/dto/response.dto';
 import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { AdminUpdateUserDto } from '../dto/admin-update-user.dto';
+import { UpdateFeedDto } from '../../feed/dto/update-feed.dto';
+import { AdminUpdateFeedDto } from '../dto/admin-update-feed.dto';
 
 @ApiTags('관리자')
 @ApiBearerAuth()
@@ -70,10 +72,14 @@ export class AdminController {
   }
 
   @Put(':id')
-  @ApiOperation({summary: '유저 정보 수정', description: '유저의 정보를 수정합니다.'})
+  @ApiOperation({
+    summary: '유저 정보 수정',
+    description: '유저의 정보를 수정합니다.',
+  })
   async updateUserInfo(
     @Param('id') id: number,
-    @Body(new ValidationPipe({ transform: true })) updateUserDto: AdminUpdateUserDto,
+    @Body(new ValidationPipe({ transform: true }))
+    updateUserDto: AdminUpdateUserDto,
   ): Promise<ResponseDto<any>> {
     const updateUser = await this.adminService.updateUserInfo(
       id,
@@ -86,6 +92,40 @@ export class AdminController {
   @ApiOperation({ summary: '유저 삭제', description: '유저를 삭제합니다.' })
   async deleteUser(@Param('id') id: number): Promise<ResponseDto<any>> {
     await this.adminService.deleteUserById(id);
+    return ResponseDto.ok();
+  }
+
+  @Get('all')
+  @ApiOperation({summary:'모든 피드 조회', description:'모든 피드를 조회합니다'})
+  async getAllFeeds(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<ResponseDto<any>> {
+    const feeds = await this.adminService.getAllFeeds(page, limit);
+    return ResponseDto.ok(feeds);
+  }
+
+  @Put('feeds/:id')
+  @ApiOperation({
+    summary: '피드 정보 수정',
+    description: '피드의 정보를 수정합니다.',
+  })
+  async updateFeedInfo(
+    @Param('id') id: number,
+    @Body(new ValidationPipe({ transform: true }))
+    updateFeedDto: AdminUpdateFeedDto,
+  ): Promise<ResponseDto<any>> {
+    const updateFeed = await this.adminService.updateFeedInfo(
+      id, updateFeedDto,
+    );
+    return ResponseDto.ok(updateFeed);
+  }
+
+  @Delete('feeds/:id')
+  @ApiOperation({ summary: '피드 삭제', description: '피드를 삭제합니다' })
+  async deleteFeed(@Param('id') id: number): Promise<ResponseDto<any>> {
+
+    await this.adminService.deleteFeedById(id);
     return ResponseDto.ok();
   }
 }
