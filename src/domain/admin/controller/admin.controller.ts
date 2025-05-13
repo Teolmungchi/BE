@@ -3,7 +3,7 @@ import {
   Get,
   Query,
   UseGuards,
-  Req,
+  Req, Delete, Param, Put, Body, ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from '../admin.service';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
@@ -13,6 +13,9 @@ import { UserActivityStatDto } from '../dto/user-activity-stat.dto';
 import { MatchingStatDto } from '../dto/matching-stat.dto';
 import { RecentAnimalDto } from '../dto/recent-animal.dto';
 import { UserListDto } from '../dto/user-list.dto';
+import { ResponseDto } from '../../../global/exception/dto/response.dto';
+import { UpdateUserDto } from '../../users/dto/update-user.dto';
+import { AdminUpdateUserDto } from '../dto/admin-update-user.dto';
 
 @ApiTags('관리자')
 @ApiBearerAuth()
@@ -22,13 +25,19 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('dashboard')
-  @ApiOperation({ summary: '대시보드 통계', description: '총 사용자, 실종/발견 신고 건수, 전월 대비 증감율 제공' })
+  @ApiOperation({
+    summary: '대시보드 통계',
+    description: '총 사용자, 실종/발견 신고 건수, 전월 대비 증감율 제공',
+  })
   async getDashboardStats(): Promise<DashboardStatsDto> {
     return this.adminService.getDashboard();
   }
 
   @Get('activity')
-  @ApiOperation({ summary: '유저 활동 통계', description: '날짜별 활성 사용자, 신규 가입, 실종/발견 신고 건수 제공' })
+  @ApiOperation({
+    summary: '유저 활동 통계',
+    description: '날짜별 활성 사용자, 신규 가입, 실종/발견 신고 건수 제공',
+  })
   @ApiQuery({ name: 'startDate', required: true, description: 'YYYY-MM-DD' })
   @ApiQuery({ name: 'endDate', required: true, description: 'YYYY-MM-DD' })
   async getUserActivityStats(
@@ -46,7 +55,10 @@ export class AdminController {
   // }
 
   @Get('recent')
-  @ApiOperation({ summary: '최근 등록 동물', description: '가장 최근 등록된 동물 5개 ' })
+  @ApiOperation({
+    summary: '최근 등록 동물',
+    description: '가장 최근 등록된 동물 5개 ',
+  })
   async getRecentAnimals(): Promise<RecentAnimalDto[]> {
     return this.adminService.getRecentAnimals();
   }
@@ -55,5 +67,25 @@ export class AdminController {
   @ApiOperation({ summary: '유저 리스트', description: '유저 정보 리스트 ' })
   async getUserList(): Promise<UserListDto[]> {
     return this.adminService.getUserList();
+  }
+
+  @Put(':id')
+  @ApiOperation({summary: '유저 정보 수정', description: '유저의 정보를 수정합니다.'})
+  async updateUserInfo(
+    @Param('id') id: number,
+    @Body(new ValidationPipe({ transform: true })) updateUserDto: AdminUpdateUserDto,
+  ): Promise<ResponseDto<any>> {
+    const updateUser = await this.adminService.updateUserInfo(
+      id,
+      updateUserDto,
+    );
+    return ResponseDto.ok(updateUser);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: '유저 삭제', description: '유저를 삭제합니다.' })
+  async deleteUser(@Param('id') id: number): Promise<ResponseDto<any>> {
+    await this.adminService.deleteUserById(id);
+    return ResponseDto.ok();
   }
 }
