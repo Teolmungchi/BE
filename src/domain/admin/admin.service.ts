@@ -9,6 +9,8 @@ import { ErrorCode } from '../../global/exception/error-code';
 import { RecentAnimalDto } from './dto/recent-animal.dto';
 import { DashboardStatsDto } from './dto/dashboard-stats.dto';
 import { UserListDto } from './dto/user-list.dto';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+import { UsersDto } from '../users/dto/users.dto';
 
 
 
@@ -192,4 +194,32 @@ export class AdminService {
   // getMatch(month: string) {
   //   return undefined;
   // }
+
+  async deleteUserById(userId: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new CommonException(ErrorCode.NOT_FOUND_USER);
+    }
+    await this.userRepository.delete({ id: userId });
+    // FK ON DELETE CASCADE가 걸려있다면 연관 레코드도 자동 삭제됨
+  }
+
+  async updateUserInfo(
+    userId: number,
+    updateUserDto: AdminUpdateUserDto,
+  ): Promise<UsersDto> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new CommonException(ErrorCode.NOT_FOUND_USER);
+    }
+    if (updateUserDto.name !== undefined) user.name = updateUserDto.name;
+    if (updateUserDto.serial_id !== undefined) user.serialId = updateUserDto.serial_id;
+    if (updateUserDto.is_login !== undefined) user.isLogin = updateUserDto.is_login;
+    if (updateUserDto.role !== undefined) user.role = updateUserDto.role;
+
+    const updatedUser = await this.userRepository.save(user);
+    return UsersDto.fromEntity(updatedUser);
+  }
+
+
 }
