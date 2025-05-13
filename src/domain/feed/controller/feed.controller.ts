@@ -320,15 +320,7 @@ export class FeedController {
     return ResponseDto.ok(feeds);
   }
 
-  @Get('all')
-  @UseGuards(JwtAuthGuard)
-  async getAllFeeds(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<ResponseDto<any>> {
-    const feeds = await this.feedService.getAllFeeds(page, limit);
-    return ResponseDto.ok(feeds);
-  }
+
 
   @ApiOperation({
     summary: '피드(게시글) 삭제',

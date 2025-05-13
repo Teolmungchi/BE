@@ -11,6 +11,7 @@ import { DashboardStatsDto } from './dto/dashboard-stats.dto';
 import { UserListDto } from './dto/user-list.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UsersDto } from '../users/dto/users.dto';
+import { AdminUpdateFeedDto } from './dto/admin-update-feed.dto';
 
 
 
@@ -23,8 +24,12 @@ export class AdminService {
     private readonly feedRepository: Repository<Feed>,
   ) {}
 
-  async getUserActivity(startDate: string, endDate: string): Promise<UserActivityStatDto[]> {
-    const rawStats = await this.userRepository.query(`
+  async getUserActivity(
+    startDate: string,
+    endDate: string,
+  ): Promise<UserActivityStatDto[]> {
+    const rawStats = await this.userRepository.query(
+      `
       SELECT
         d.date,
         COALESCE(u.activeUsers, 0) AS activeUsers,
@@ -62,21 +67,34 @@ export class AdminService {
         GROUP BY DATE(created_at)
         ) f ON d.date = f.date
       ORDER BY d.date ASC
-    `, [startDate, endDate, startDate, endDate, startDate, endDate, startDate, endDate]);
+    `,
+      [
+        startDate,
+        endDate,
+        startDate,
+        endDate,
+        startDate,
+        endDate,
+        startDate,
+        endDate,
+      ],
+    );
 
     if (!rawStats || rawStats.length === 0) {
       throw new CommonException(ErrorCode.NOT_FOUND_DATA);
     }
 
-    return rawStats.map(row => new UserActivityStatDto({
-      date: row.date,
-      activeUsers: Number(row.activeUsers),
-      newUsers: Number(row.newUsers),
-      missingReports: Number(row.missingReports),
-      foundReports: Number(row.foundReports),
-    }));
+    return rawStats.map(
+      (row) =>
+        new UserActivityStatDto({
+          date: row.date,
+          activeUsers: Number(row.activeUsers),
+          newUsers: Number(row.newUsers),
+          missingReports: Number(row.missingReports),
+          foundReports: Number(row.foundReports),
+        }),
+    );
   }
-
 
   // 최근 등록 동물 5개
   async getRecentAnimals(): Promise<RecentAnimalDto[]> {
@@ -88,20 +106,24 @@ export class AdminService {
     if (!feeds || feeds.length === 0) {
       throw new CommonException(ErrorCode.NOT_FOUND_DATA);
     }
-    return feeds.map(feed => new RecentAnimalDto({
-      id: feed.id,
-      type: feed.title.includes('실종') ? 'missing' : 'found',
-      animalType: feed.dogType || 'unknown',
-      breed: feed.dogFeature || 'unknown',
-      location: feed.lostPlace || '',
-      date: feed.lostDate ? new Date(feed.lostDate).toISOString().slice(0, 10) : '',
-      image: feed.fileName,
-      user: {
-        name: feed.author?.name,
-      },
-    }));
+    return feeds.map(
+      (feed) =>
+        new RecentAnimalDto({
+          id: feed.id,
+          type: feed.title.includes('실종') ? 'missing' : 'found',
+          animalType: feed.dogType || 'unknown',
+          breed: feed.dogFeature || 'unknown',
+          location: feed.lostPlace || '',
+          date: feed.lostDate
+            ? new Date(feed.lostDate).toISOString().slice(0, 10)
+            : '',
+          image: feed.fileName,
+          user: {
+            name: feed.author?.name,
+          },
+        }),
+    );
   }
-
 
   async getDashboard(): Promise<DashboardStatsDto> {
     const totalUsers = await this.userRepository.count();
@@ -116,7 +138,15 @@ export class AdminService {
     const now = new Date();
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    const lastMonthEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     const thisMonthUsers = await this.userRepository.count({
       where: { createdAt: MoreThanOrEqual(thisMonthStart) },
@@ -124,7 +154,10 @@ export class AdminService {
     const lastMonthUsers = await this.userRepository.count({
       where: { createdAt: Between(lastMonthStart, lastMonthEnd) },
     });
-    const userGrowthRate = lastMonthUsers === 0 ? 0 : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
+    const userGrowthRate =
+      lastMonthUsers === 0
+        ? 0
+        : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
 
     const thisMonthMissing = await this.feedRepository.count({
       where: {
@@ -138,7 +171,10 @@ export class AdminService {
         createdAt: Between(lastMonthStart, lastMonthEnd),
       },
     });
-    const missingGrowthRate = lastMonthMissing === 0 ? 0 : ((thisMonthMissing - lastMonthMissing) / lastMonthMissing) * 100;
+    const missingGrowthRate =
+      lastMonthMissing === 0
+        ? 0
+        : ((thisMonthMissing - lastMonthMissing) / lastMonthMissing) * 100;
 
     const thisMonthFound = await this.feedRepository.count({
       where: {
@@ -152,7 +188,10 @@ export class AdminService {
         createdAt: Between(lastMonthStart, lastMonthEnd),
       },
     });
-    const foundGrowthRate = lastMonthFound === 0 ? 0 : ((thisMonthFound - lastMonthFound) / lastMonthFound) * 100;
+    const foundGrowthRate =
+      lastMonthFound === 0
+        ? 0
+        : ((thisMonthFound - lastMonthFound) / lastMonthFound) * 100;
 
     return new DashboardStatsDto({
       totalUsers,
@@ -178,18 +217,19 @@ export class AdminService {
       ])
       .getMany();
 
-    return users.map(user => new UserListDto({
-      user_id: user.id,
-      serial_id: user.serialId,
-      name: user.name,
-      is_login: user.isLogin,
-      created_at: user.createdAt,
-      updated_at: user.updatedAt,
-      role: user.role,
-    }));
+    return users.map(
+      (user) =>
+        new UserListDto({
+          user_id: user.id,
+          serial_id: user.serialId,
+          name: user.name,
+          is_login: user.isLogin,
+          created_at: user.createdAt,
+          updated_at: user.updatedAt,
+          role: user.role,
+        }),
+    );
   }
-
-
 
   // getMatch(month: string) {
   //   return undefined;
@@ -213,13 +253,52 @@ export class AdminService {
       throw new CommonException(ErrorCode.NOT_FOUND_USER);
     }
     if (updateUserDto.name !== undefined) user.name = updateUserDto.name;
-    if (updateUserDto.serial_id !== undefined) user.serialId = updateUserDto.serial_id;
-    if (updateUserDto.is_login !== undefined) user.isLogin = updateUserDto.is_login;
+    if (updateUserDto.serial_id !== undefined)
+      user.serialId = updateUserDto.serial_id;
+    if (updateUserDto.is_login !== undefined)
+      user.isLogin = updateUserDto.is_login;
     if (updateUserDto.role !== undefined) user.role = updateUserDto.role;
 
     const updatedUser = await this.userRepository.save(user);
     return UsersDto.fromEntity(updatedUser);
   }
 
+  async getAllFeeds(
+    page: number,
+    limit: number,
+  ): Promise<{ feeds: Feed[]; total: number }> {
+    const [feeds, total] = await this.feedRepository.findAndCount({
+      relations: ['author'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return { feeds, total };
+  }
+
+  async deleteFeedById(feedId: number): Promise<void> {
+    const feed = await this.feedRepository.findOne({ where: { id: feedId } });
+    if (!feed) {
+      throw new CommonException(ErrorCode.NOT_FOUND_FEED);
+    }
+    await this.feedRepository.delete({ id: feedId });
+  }
+
+  async updateFeedInfo(feedId: number, updateFeedDto: AdminUpdateFeedDto): Promise<Feed> {
+    const feed = await this.feedRepository.findOne({ where: { id: feedId } });
+    if (!feed) {
+      throw new CommonException(ErrorCode.NOT_FOUND_FEED);
+    }
+
+    for (const [key, value] of Object.entries(updateFeedDto)) {
+      if (value !== undefined) {
+        feed[key] = value;
+      }
+    }
+
+    const updatedFeed = await this.feedRepository.save(feed);
+    return updatedFeed;
+  }
 
 }
