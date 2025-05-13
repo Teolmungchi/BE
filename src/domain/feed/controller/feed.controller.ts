@@ -3,7 +3,7 @@ import {
   Body,
   Controller, Delete, Get,
   Param, ParseIntPipe,
-  Post, Put,
+  Post, Put, Query,
   Req,
   UseFilters,
   UseGuards,
@@ -317,6 +317,16 @@ export class FeedController {
   async getFeeds(@Req() req): Promise<ResponseDto<any>> {
     const userId = req.user.id;
     const feeds = await this.feedService.getFeeds(userId);
+    return ResponseDto.ok(feeds);
+  }
+
+  @Get('all')
+  @UseGuards(JwtAuthGuard)
+  async getAllFeeds(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<ResponseDto<any>> {
+    const feeds = await this.feedService.getAllFeeds(page, limit);
     return ResponseDto.ok(feeds);
   }
 
