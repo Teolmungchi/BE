@@ -128,36 +128,29 @@ export class AdminService {
   }
 
   async getDashboard(): Promise<DashboardStatsDto> {
-    // 날짜 계산
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
-    // 전체 사용자 수
+    // 1. 총 사용자 수
     const totalUsers = await this.userRepository.count();
 
-    // 매칭 결과 기준 실종/발견 수
-    const missingReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.NOT_FOUND } });
-    const foundReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.FOUND } });
+    // 2. 실종 신고: 전체 feed 글 수
+    const missingReports = await this.feedRepository.count();
 
-    // 매칭 성공률
-    const totalMatches = missingReports + foundReports;
-    const matchingSuccessRate = totalMatches === 0 ? 0 : (foundReports / totalMatches) * 100;
-
-    // 전월 대비 사용자 증가율
-    const thisMonthUsers = await this.userRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonthStart) } });
-    const lastMonthUsers = await this.userRepository.count({ where: { createdAt: Between(lastMonthStart, lastMonthEnd) } });
-    const usersChange = lastMonthUsers === 0 ? 0 : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
-
-    // 오늘 실종/발견 신고 수
-    const missingToday = await this.matchingResultRepository.count({
-      where: {
-        status: MatchingStatus.NOT_FOUND,
-        createdAt: MoreThanOrEqual(todayStart),
-      },
+    // 3. 오늘 실종 신고: 오늘 생성된 feed 글 수
+    const missingToday = await this.feedRepository.count({
+      where: { createdAt: MoreThanOrEqual(todayStart) },
     });
+
+    // 4. 발견 신고: FOUND 상태의 matching_result 총 count
+    const foundReports = await this.matchingResultRepository.count({
+      where: { status: MatchingStatus.FOUND },
+    });
+
+    // 5. 오늘 발견 신고: 오늘 FOUND된 matching_result count
     const foundToday = await this.matchingResultRepository.count({
       where: {
         status: MatchingStatus.FOUND,
@@ -165,7 +158,16 @@ export class AdminService {
       },
     });
 
-    // 전월 매칭 성공률
+    // 6. 매칭 성공률: FOUND / (전체 matching_result)
+    const totalMatches = await this.matchingResultRepository.count();
+    const matchingSuccessRate = totalMatches === 0 ? 0 : (foundReports / totalMatches) * 100;
+
+    // 7. 전월 대비 사용자 증가율
+    const thisMonthUsers = await this.userRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonthStart) } });
+    const lastMonthUsers = await this.userRepository.count({ where: { createdAt: Between(lastMonthStart, lastMonthEnd) } });
+    const usersChange = lastMonthUsers === 0 ? 0 : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
+
+    // 8. 전월 매칭 성공률 및 변화량
     const lastMonthMatches = await this.matchingResultRepository.count({
       where: {
         createdAt: Between(lastMonthStart, lastMonthEnd),
