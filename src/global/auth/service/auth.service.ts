@@ -54,7 +54,7 @@ export class AuthService {
     user.isLogin = true;
     await this.userRepository.save(user);
 
-    return tokens;
+    return JwtTokenDto.of(tokens.accessToken, tokens.refreshToken, user.id)
   }
 
   async logout(userId: number): Promise<void> {
@@ -102,7 +102,7 @@ export class AuthService {
     user.refreshToken = tokens.refreshToken;
     await this.userRepository.save(user);
 
-    return tokens;
+    return JwtTokenDto.of(tokens.accessToken, tokens.refreshToken, user.id);
   }
 
   private generateTokens(userId: number): JwtTokenDto {
@@ -110,7 +110,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // accessToken 1시간 유효
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '14d' }); // refreshToken 14일 유효
 
-    return { accessToken, refreshToken };
+    return JwtTokenDto.of(accessToken, refreshToken, userId)
   }
 
   async parseBearerToken(
