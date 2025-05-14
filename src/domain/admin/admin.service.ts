@@ -14,6 +14,7 @@ import { UserListDto } from './dto/user-list.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UsersDto } from '../users/dto/users.dto';
 import { AdminUpdateFeedDto } from './dto/admin-update-feed.dto';
+import { UserStatsDto } from './dto/user-stats.dto';
 
 @Injectable()
 export class AdminService {
@@ -287,5 +288,48 @@ export class AdminService {
 
     const updatedFeed = await this.feedRepository.save(feed);
     return updatedFeed;
+  }
+
+  async getUserStats(): Promise<UserStatsDto> {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(todayStart.getDate() - 1);
+    const yesterdayEnd = new Date(todayStart.getTime() - 1);
+    const last7DaysStart = new Date(todayStart);
+    last7DaysStart.setDate(todayStart.getDate() - 6);
+
+    // 오늘 신규 가입자
+    const todayNew = await this.userRepository.count({
+      where: { createdAt: MoreThanOrEqual(todayStart) },
+    });
+
+    // 어제 신규 가입자
+    const yesterdayNew = await this.userRepository.count({
+      where: {
+        createdAt: Between(yesterdayStart, yesterdayEnd),
+      },
+    });
+
+    // 현재 로그인 상태인 사용자 수
+    const loginActive = await this.userRepository.count({
+      where: { isLogin: true },
+    });
+
+    // 최근 7일 신규 가입자
+    const last7DaysNew = await this.userRepository.count({
+      where: { createdAt: MoreThanOrEqual(last7DaysStart) },
+    });
+
+    // 전체 회원 수
+    const totalUsers = await this.userRepository.count();
+
+    return new UserStatsDto({
+      todayNew,
+      yesterdayNew,
+      loginActive,
+      last7DaysNew,
+      totalUsers,
+    });
   }
 }

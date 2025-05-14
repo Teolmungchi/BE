@@ -18,6 +18,7 @@ import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { AdminUpdateUserDto } from '../dto/admin-update-user.dto';
 import { UpdateFeedDto } from '../../feed/dto/update-feed.dto';
 import { AdminUpdateFeedDto } from '../dto/admin-update-feed.dto';
+import { UserStatsDto } from '../dto/user-stats.dto';
 
 @ApiTags('관리자')
 @ApiBearerAuth()
@@ -127,5 +128,14 @@ export class AdminController {
 
     await this.adminService.deleteFeedById(id);
     return ResponseDto.ok();
+  }
+
+  @Get('user-stats')
+  @ApiOperation({
+    summary: '회원 통계',
+    description: '오늘/어제 신규가입, 로그인활동, 최근7일 신규가입, 전체회원수',
+  })
+  async getUserStats(): Promise<UserStatsDto> {
+    return this.adminService.getUserStats();
   }
 }
