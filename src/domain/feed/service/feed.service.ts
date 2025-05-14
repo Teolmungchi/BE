@@ -7,12 +7,15 @@ import { Feed } from '../entity/feed.entity';
 import { CommonException } from '../../../global/exception/common-exception';
 import { ErrorCode } from '../../../global/exception/error-code';
 import { UserRepository } from '../../users/repository/user.repository';
+import { FeedResponseDto } from '../dto/feed-response.dto';
 
 @Injectable()
 @UseFilters(HttpExceptionFilter)
 export class FeedService {
-  constructor(private feedRepository: FeedRepository,
-              private userRepository: UserRepository,) {}
+  constructor(
+    private feedRepository: FeedRepository,
+    private userRepository: UserRepository,
+  ) {}
 
   async createFeed(
     userId: number,
@@ -57,7 +60,7 @@ export class FeedService {
     }
     const feeds = await this.feedRepository.find({
       where: { author: { id: userId } },
-      relations: ['author']
+      relations: ['author'],
     });
 
     return feeds;
@@ -67,29 +70,32 @@ export class FeedService {
     userId: number,
     id: number,
     updateFeedDto: UpdateFeedDto,
-  ) : Promise<Feed> {
+  ): Promise<Feed> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new CommonException(ErrorCode.NOT_FOUND_USER);
     }
 
     const feed = await this.feedRepository.findOne({
-      where: {id},
+      where: { id },
       relations: ['author'],
-    })
+    });
     if (!feed) {
       throw new CommonException(ErrorCode.NOT_FOUND_FEED);
     }
-    if(feed.author.id !== userId) {
+    if (feed.author.id !== userId) {
       throw new CommonException(ErrorCode.ACCESS_DENIED);
     }
 
-    const updatedFields = Object.entries(updateFeedDto).reduce((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as Partial<Feed>)
+    const updatedFields = Object.entries(updateFeedDto).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Partial<Feed>,
+    );
 
     Object.assign(feed, updatedFields);
 
@@ -102,7 +108,10 @@ export class FeedService {
       throw new CommonException(ErrorCode.NOT_FOUND_USER);
     }
 
-    const feed = await this.feedRepository.findOne({ where: { id }, relations: ['author'] });
+    const feed = await this.feedRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!feed) {
       throw new CommonException(ErrorCode.NOT_FOUND_FEED);
     }
@@ -112,5 +121,33 @@ export class FeedService {
     await this.feedRepository.remove(feed);
   }
 
+  async getAllFeeds(): Promise<FeedResponseDto[]> {
+    const feeds = await this.feedRepository.find({
+      relations: ['author'],
+      order: { createdAt: 'DESC' },
+    });
 
+    // DTO 변환
+    return feeds.map(feed => ({
+      id: feed.id,
+      title: feed.title,
+      content: feed.content,
+      fileName: feed.fileName,
+      lostDate: feed.lostDate,
+      lostPlace: feed.lostPlace,
+      placeFeature: feed.placeFeature,
+      dogType: feed.dogType,
+      dogAge: feed.dogAge,
+      dogGender: feed.dogGender,
+      dogColor: feed.dogColor,
+      dogFeature: feed.dogFeature,
+      likesCount: feed.likesCount,
+      createdAt: feed.createdAt,
+      updatedAt: feed.updatedAt,
+      author: {
+        id: feed.author.id,
+        name: feed.author.name,
+      },
+    }));
+  }
 }
