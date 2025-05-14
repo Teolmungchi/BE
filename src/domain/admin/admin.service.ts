@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, Between, MoreThanOrEqual } from 'typeorm';
 import { User } from '../users/entity/user.entity';
 import { Feed } from '../feed/entity/feed.entity';
+import { MatchingResult } from '../match/entity/matching-result.entity';
+import { MatchingStatus } from '../match/entity/matching-status.enum';
 import { UserActivityStatDto } from './dto/user-activity-stat.dto';
 import { CommonException } from '../../global/exception/common-exception';
 import { ErrorCode } from '../../global/exception/error-code';
@@ -13,8 +15,6 @@ import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UsersDto } from '../users/dto/users.dto';
 import { AdminUpdateFeedDto } from './dto/admin-update-feed.dto';
 
-
-
 @Injectable()
 export class AdminService {
   constructor(
@@ -22,6 +22,8 @@ export class AdminService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Feed)
     private readonly feedRepository: Repository<Feed>,
+    @InjectRepository(MatchingResult)
+    private readonly matchingResultRepository: Repository<MatchingResult>,
   ) {}
 
   async getUserActivity(
@@ -127,81 +129,19 @@ export class AdminService {
 
   async getDashboard(): Promise<DashboardStatsDto> {
     const totalUsers = await this.userRepository.count();
-
-    const missingReports = await this.feedRepository.count({
-      where: { title: Like('%실종%') },
-    });
-    const foundReports = await this.feedRepository.count({
-      where: { title: Like('%발견%') },
-    });
-
-    const now = new Date();
-    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      0,
-      23,
-      59,
-      59,
-      999,
-    );
-
-    const thisMonthUsers = await this.userRepository.count({
-      where: { createdAt: MoreThanOrEqual(thisMonthStart) },
-    });
-    const lastMonthUsers = await this.userRepository.count({
-      where: { createdAt: Between(lastMonthStart, lastMonthEnd) },
-    });
-    const userGrowthRate =
-      lastMonthUsers === 0
-        ? 0
-        : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
-
-    const thisMonthMissing = await this.feedRepository.count({
-      where: {
-        title: Like('%실종%'),
-        createdAt: MoreThanOrEqual(thisMonthStart),
-      },
-    });
-    const lastMonthMissing = await this.feedRepository.count({
-      where: {
-        title: Like('%실종%'),
-        createdAt: Between(lastMonthStart, lastMonthEnd),
-      },
-    });
-    const missingGrowthRate =
-      lastMonthMissing === 0
-        ? 0
-        : ((thisMonthMissing - lastMonthMissing) / lastMonthMissing) * 100;
-
-    const thisMonthFound = await this.feedRepository.count({
-      where: {
-        title: Like('%발견%'),
-        createdAt: MoreThanOrEqual(thisMonthStart),
-      },
-    });
-    const lastMonthFound = await this.feedRepository.count({
-      where: {
-        title: Like('%발견%'),
-        createdAt: Between(lastMonthStart, lastMonthEnd),
-      },
-    });
-    const foundGrowthRate =
-      lastMonthFound === 0
-        ? 0
-        : ((thisMonthFound - lastMonthFound) / lastMonthFound) * 100;
+    const missingReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.NOT_FOUND } });
+    const foundReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.FOUND } });
+    const totalMatches = missingReports + foundReports;
+    const matchingSuccessRate = totalMatches === 0 ? 0 : (foundReports / totalMatches) * 100;
 
     return new DashboardStatsDto({
       totalUsers,
       missingReports,
       foundReports,
-      userGrowthRate,
-      missingGrowthRate,
-      foundGrowthRate,
+      matchingSuccessRate: Number(matchingSuccessRate.toFixed(1)),
     });
   }
+
 
   async getUserList(): Promise<UserListDto[]> {
     const users = await this.userRepository
@@ -231,17 +171,12 @@ export class AdminService {
     );
   }
 
-  // getMatch(month: string) {
-  //   return undefined;
-  // }
-
   async deleteUserById(userId: number): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new CommonException(ErrorCode.NOT_FOUND_USER);
     }
     await this.userRepository.delete({ id: userId });
-    // FK ON DELETE CASCADE가 걸려있다면 연관 레코드도 자동 삭제됨
   }
 
   async updateUserInfo(
@@ -300,5 +235,4 @@ export class AdminService {
     const updatedFeed = await this.feedRepository.save(feed);
     return updatedFeed;
   }
-
 }

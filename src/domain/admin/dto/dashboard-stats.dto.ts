@@ -1,11 +1,9 @@
 export class DashboardStatsDto {
-  constructor(partial: Partial<DashboardStatsDto>) {
-    Object.assign(this, partial);
-  }
   totalUsers: number;
   missingReports: number;
   foundReports: number;
-  userGrowthRate: number;
-  missingGrowthRate: number;
-  foundGrowthRate: number;
+  matchingSuccessRate: number;
+  constructor(partial?: Partial<DashboardStatsDto>) {
+    if (partial) Object.assign(this, partial);
+  }
 }
