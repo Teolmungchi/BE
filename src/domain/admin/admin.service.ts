@@ -128,19 +128,70 @@ export class AdminService {
   }
 
   async getDashboard(): Promise<DashboardStatsDto> {
+    // 날짜 계산
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    // 전체 사용자 수
     const totalUsers = await this.userRepository.count();
+
+    // 매칭 결과 기준 실종/발견 수
     const missingReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.NOT_FOUND } });
     const foundReports = await this.matchingResultRepository.count({ where: { status: MatchingStatus.FOUND } });
+
+    // 매칭 성공률
     const totalMatches = missingReports + foundReports;
     const matchingSuccessRate = totalMatches === 0 ? 0 : (foundReports / totalMatches) * 100;
+
+    // 전월 대비 사용자 증가율
+    const thisMonthUsers = await this.userRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonthStart) } });
+    const lastMonthUsers = await this.userRepository.count({ where: { createdAt: Between(lastMonthStart, lastMonthEnd) } });
+    const usersChange = lastMonthUsers === 0 ? 0 : ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
+
+    // 오늘 실종/발견 신고 수
+    const missingToday = await this.matchingResultRepository.count({
+      where: {
+        status: MatchingStatus.NOT_FOUND,
+        createdAt: MoreThanOrEqual(todayStart),
+      },
+    });
+    const foundToday = await this.matchingResultRepository.count({
+      where: {
+        status: MatchingStatus.FOUND,
+        createdAt: MoreThanOrEqual(todayStart),
+      },
+    });
+
+    // 전월 매칭 성공률
+    const lastMonthMatches = await this.matchingResultRepository.count({
+      where: {
+        createdAt: Between(lastMonthStart, lastMonthEnd),
+      },
+    });
+    const lastMonthFound = await this.matchingResultRepository.count({
+      where: {
+        status: MatchingStatus.FOUND,
+        createdAt: Between(lastMonthStart, lastMonthEnd),
+      },
+    });
+    const lastMonthMatchingRate = lastMonthMatches === 0 ? 0 : (lastMonthFound / lastMonthMatches) * 100;
+    const matchingChange = matchingSuccessRate - lastMonthMatchingRate;
 
     return new DashboardStatsDto({
       totalUsers,
       missingReports,
       foundReports,
       matchingSuccessRate: Number(matchingSuccessRate.toFixed(1)),
+      usersChange: Number(usersChange.toFixed(1)),
+      missingToday,
+      foundToday,
+      matchingChange: Number(matchingChange.toFixed(1)),
     });
   }
+
 
 
   async getUserList(): Promise<UserListDto[]> {
