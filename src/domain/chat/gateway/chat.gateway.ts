@@ -51,9 +51,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         id: payload.userId,
       };
       this.logger.log(
-        `연결 성공: ${client.id}, User: ${payload.sub || payload.id}`,
+        `연결 성공: ${client.id}, User: ${payload.sub || payload.userId}`,
       );
-      client.emit('connectSuccess', { userId: payload.sub || payload.id });
+      client.emit('connectSuccess', { userId: payload.sub || payload.userId });
     } catch (error) {
       this.logger.error(`인증 실패: ${client.id}: ${error.message}`);
       client.emit('error', { message: error.message || '인증실패' });
