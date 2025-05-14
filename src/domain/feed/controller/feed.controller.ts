@@ -17,6 +17,8 @@ import { JwtAuthGuard } from '../../../global/common/guards/jwt-auth.guard';
 import { ResponseDto } from '../../../global/exception/dto/response.dto';
 import { CreateFeedDto } from '../dto/create-feed.dto';
 import { UpdateFeedDto } from '../dto/update-feed.dto';
+import { Feed } from '../entity/feed.entity';
+import { FeedResponseDto } from '../dto/feed-response.dto';
 
 @ApiTags('피드(게시판)')
 @Controller('api/v1/feed')
@@ -24,6 +26,62 @@ import { UpdateFeedDto } from '../dto/update-feed.dto';
 @UseFilters(HttpExceptionFilter)
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
+
+  @ApiOperation({
+    summary: '모든 피드(게시글) 조회',
+    description: '모든 피드(게시글)을 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '피드(게시글) 조회 성공',
+    schema: {
+      example: {
+        "httpStatus": 200,
+        "success": true,
+        "data": [
+          {
+            "id": 51,
+            "title": "발견 강아지",
+            "content": "생성할 피드(게시글) 내용.",
+            "fileName": "sdlfmalsas-asdd",
+            "lostDate": "2025-05-13",
+            "lostPlace": "가천대학교 AI공학관",
+            "placeFeature": "정문에서 제일 멀어요",
+            "dogType": "말라뮤트",
+            "dogAge": 7,
+            "dogGender": "남자",
+            "dogColor": "흰색",
+            "dogFeature": "빨간색 목걸이를 하고 있어요",
+            "likesCount": 0,
+            "createdAt": "2025-05-14T01:13:33.000Z",
+            "updatedAt": "2025-05-14T01:13:33.000Z",
+            "author": {
+              "id": 15,
+              "name": "수민띵"
+            }
+          }
+        ]
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'JWT 토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @Get('all')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getAllFeeds(@Req() req): Promise<ResponseDto<FeedResponseDto[]>> {
+    const feeds = await this.feedService.getAllFeeds();
+    return ResponseDto.ok(feeds);
+  }
 
   @ApiOperation({
     summary: '피드 생성',
@@ -228,9 +286,11 @@ export class FeedController {
     return ResponseDto.ok(feed);
   }
 
+
+
   @ApiOperation({
-    summary: '모든 피드(게시글) 조회',
-    description: '모든 피드(게시글)을 조회합니다.',
+    summary: '내가 작성한 모든 피드(게시글) 조회',
+    description: '내가 작성한 모든 피드(게시글)을 조회합니다.',
   })
   @ApiBearerAuth()
   @ApiResponse({
@@ -361,5 +421,7 @@ export class FeedController {
     await this.feedService.deleteFeedById(userId, id);
     return ResponseDto.ok({ message: '피드(게시글) 삭제 성공' });
   }
+
+
 }
 
