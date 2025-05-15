@@ -9,6 +9,7 @@ export class RecentAnimalDto {
   user: {
     name: string;
   };
+  matchingStatuses?: string[];
 
   constructor(partial: Partial<RecentAnimalDto>) {
     Object.assign(this, partial);
