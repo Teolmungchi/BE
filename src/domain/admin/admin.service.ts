@@ -104,7 +104,7 @@ export class AdminService {
     const feeds = await this.feedRepository.find({
       order: { id: 'DESC' },
       take: 5,
-      relations: ['author'],
+      relations: ['author', 'matchingResults'],
     });
     if (!feeds || feeds.length === 0) {
       throw new CommonException(ErrorCode.NOT_FOUND_DATA);
@@ -124,6 +124,9 @@ export class AdminService {
           user: {
             name: feed.author?.name,
           },
+          matchingStatuses: feed.matchingResults
+            ? feed.matchingResults.map((mr) => mr.status)
+            : [],
         }),
     );
   }
@@ -257,7 +260,7 @@ export class AdminService {
     limit: number,
   ): Promise<{ feeds: Feed[]; total: number }> {
     const [feeds, total] = await this.feedRepository.findAndCount({
-      relations: ['author'],
+      relations: ['author', 'matchingResults'],
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
