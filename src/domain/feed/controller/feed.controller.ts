@@ -19,6 +19,7 @@ import { CreateFeedDto } from '../dto/create-feed.dto';
 import { UpdateFeedDto } from '../dto/update-feed.dto';
 import { Feed } from '../entity/feed.entity';
 import { FeedResponseDto } from '../dto/feed-response.dto';
+import { FeedUrlResponseDto } from '../dto/feed-url-response.dto';
 
 @ApiTags('피드(게시판)')
 @Controller('api/v1/feed')
@@ -82,6 +83,55 @@ export class FeedController {
     const feeds = await this.feedService.getAllFeeds();
     return ResponseDto.ok(feeds);
   }
+
+  // feed.controller.ts
+
+  @ApiOperation({
+    summary: '모든 피드(게시글) 조회',
+    description: '모든 피드(게시글)을 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '피드(게시글) 조회 성공',
+    schema: {
+      example: {
+        "httpStatus": 200,
+        "success": true,
+        "data": [
+          {
+            "feed_id": 51,
+            "authorId": 15,
+            "presigned_url": "http://localhost:9000/tmc/sdlfmalsas-asdd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250516%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250516T043756Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=071e8340815d0895721492687b1d01e0ca7afe08e77ab0195035f5264afc94a2"
+          },
+          {
+            "feed_id": 52,
+            "authorId": 15,
+            "presigned_url": "http://localhost:9000/tmc/sdlfmalsas-asdd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250516%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250516T043756Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=071e8340815d0895721492687b1d01e0ca7afe08e77ab0195035f5264afc94a2"
+          }
+        ]
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'JWT 토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @Get('all-urls')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getAllFeedUrls(@Req() req): Promise<ResponseDto<FeedUrlResponseDto[]>> {
+    const feeds = await this.feedService.getAllFeedUrls();
+    return ResponseDto.ok(feeds);
+  }
+
+
 
   @ApiOperation({
     summary: '피드 생성',
@@ -286,8 +336,6 @@ export class FeedController {
     return ResponseDto.ok(feed);
   }
 
-
-
   @ApiOperation({
     summary: '내가 작성한 모든 피드(게시글) 조회',
     description: '내가 작성한 모든 피드(게시글)을 조회합니다.',
@@ -380,8 +428,6 @@ export class FeedController {
     return ResponseDto.ok(feeds);
   }
 
-
-
   @ApiOperation({
     summary: '피드(게시글) 삭제',
     description: '피드(게시글)을 삭제합니다.',
@@ -422,6 +468,4 @@ export class FeedController {
     return ResponseDto.ok({ message: '피드(게시글) 삭제 성공' });
   }
 
-
 }
-

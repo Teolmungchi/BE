@@ -8,6 +8,8 @@ import { CommonException } from '../../../global/exception/common-exception';
 import { ErrorCode } from '../../../global/exception/error-code';
 import { UserRepository } from '../../users/repository/user.repository';
 import { FeedResponseDto } from '../dto/feed-response.dto';
+import { FeedUrlResponseDto } from '../dto/feed-url-response.dto';
+import { MinioService } from '../../s3/service/minio.service';
 
 @Injectable()
 @UseFilters(HttpExceptionFilter)
@@ -15,6 +17,7 @@ export class FeedService {
   constructor(
     private feedRepository: FeedRepository,
     private userRepository: UserRepository,
+    private readonly minioService: MinioService,
   ) {}
 
   async createFeed(
@@ -150,4 +153,30 @@ export class FeedService {
       },
     }));
   }
+
+  async getAllFeedUrls(): Promise<FeedUrlResponseDto[]> {
+    const feeds = await this.feedRepository
+      .createQueryBuilder('feed')
+      .leftJoin('feed.author', 'author')
+      .select([
+        'feed.id',
+        'feed.fileName',
+        'author.id',
+      ])
+      .getMany();
+
+    return Promise.all(
+      feeds.map(async feed => {
+        const presigned = await this.minioService.getPresignedUrlForDownload(feed.fileName);
+        return {
+          feed_id: feed.id,
+          authorId: feed.author?.id,
+          presigned_url: presigned.url,
+        };
+      }),
+    );
+  }
+
+
+
 }
