@@ -24,7 +24,7 @@ export class MatchService {
     userId: number
   ): Promise<{ message?: string; userId?: number }> {
     const percent = similarity > 1 ? similarity : similarity * 100;
-    const status = percent >= 70 ? MatchingStatus.FOUND : MatchingStatus.NOT_FOUND;
+    const status = percent >= 80 ? MatchingStatus.FOUND : MatchingStatus.NOT_FOUND;
 
     const feed = await this.feedRepository.findOne({ where: { id: feedId }, relations: ['author'] });
     if (!feed) throw new CommonException(ErrorCode.NOT_FOUND_FEED);
@@ -42,7 +42,7 @@ export class MatchService {
     });
     await this.matchingResultRepository.save(result);
 
-    if (percent >= 70) {
+    if (percent >= 80) {
       return {
         message: `잃어버린 동물을 제보해주셨어요! 유사도 ${Math.round(percent)}%!`,
         userId: user.id,
