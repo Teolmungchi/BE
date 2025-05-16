@@ -10,6 +10,7 @@ import { LikeModule } from './domain/like/module/like.module';
 import { ChatModule } from './domain/chat/module/chat.module';
 import { AdminModule } from './domain/admin/admin.module';
 import { MatchModule } from './domain/match/match.module';
+import { ReportModule } from './domain/report/report.module';
 
 dotenv.config();
 @Module({
@@ -23,6 +24,7 @@ dotenv.config();
     ChatModule,
     AdminModule,
     MatchModule,
+    ReportModule,
   ],
 })
 export class AppModule implements NestModule {
