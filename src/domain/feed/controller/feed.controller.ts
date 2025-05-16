@@ -19,6 +19,7 @@ import { CreateFeedDto } from '../dto/create-feed.dto';
 import { UpdateFeedDto } from '../dto/update-feed.dto';
 import { Feed } from '../entity/feed.entity';
 import { FeedResponseDto } from '../dto/feed-response.dto';
+import { FeedUrlResponseDto } from '../dto/feed-url-response.dto';
 
 @ApiTags('피드(게시판)')
 @Controller('api/v1/feed')
@@ -83,6 +84,55 @@ export class FeedController {
     return ResponseDto.ok(feeds);
   }
 
+  // feed.controller.ts
+
+  @ApiOperation({
+    summary: '모든 피드(게시글) 조회',
+    description: '모든 피드(게시글)을 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '피드(게시글) 조회 성공',
+    schema: {
+      example: {
+        "httpStatus": 200,
+        "success": true,
+        "data": [
+          {
+            "feed_id": 51,
+            "authorId": 15,
+            "presigned_url": "http://localhost:9000/tmc/sdlfmalsas-asdd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250516%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250516T043756Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=071e8340815d0895721492687b1d01e0ca7afe08e77ab0195035f5264afc94a2"
+          },
+          {
+            "feed_id": 52,
+            "authorId": 15,
+            "presigned_url": "http://localhost:9000/tmc/sdlfmalsas-asdd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250516%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250516T043756Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=071e8340815d0895721492687b1d01e0ca7afe08e77ab0195035f5264afc94a2"
+          }
+        ]
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'JWT 토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @Get('all-urls')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getAllFeedUrls(@Req() req): Promise<ResponseDto<FeedUrlResponseDto[]>> {
+    const feeds = await this.feedService.getAllFeedUrls();
+    return ResponseDto.ok(feeds);
+  }
+
+
+
   @ApiOperation({
     summary: '피드 생성',
     description: '피드(게시글)을 생성합니다.',
@@ -95,28 +145,30 @@ export class FeedController {
       example: {
         httpStatus: 200,
         success: true,
-        data: {
-          id: 6,
-          author: {
-            id: 8,
+        "data": {
+          "createdAt": "2025-05-15T19:16:06.000Z",
+          "updatedAt": "2025-05-15T19:16:06.000Z",
+          "id": 52,
+          "author": {
+            "id": 15
           },
-          title: '생성할 피드(게시글) 제목.',
-          content: '생성할 피드(게시글) 내용.',
-          imageUrl: 'https://minio.example.com/bucket/1616161616_abcd',
-          lostDate: '2025-05-07',
-          lostPlace: '가천대학교 AI공학관',
-          placeFeature: '정문에서 제일 멀어요',
-          dogType: '말티즈',
-          dogAge: 7,
-          dogGender: '남자',
-          dogColor: '흰색',
-          dogFeature: '빨간색 목걸이를 하고 있어요',
-          likesCount: 0,
-          createdAt: '2025-04-10T21:27:27.365Z',
+          "title": "강아지 찾아줭",
+          "content": "생성할 피드(게시글) 내용.",
+          "fileName": "sdlfmalsas-asdd",
+          "lostDate": "2025-04-01",
+          "lostPlace": "세종대 양꼬치집",
+          "placeFeature": "세종대 근처에서 양꼬치 먹다가 잃어버렸어요",
+          "dogType": "말티푸",
+          "dogAge": 7,
+          "dogGender": "남자",
+          "dogColor": "흰색",
+          "dogFeature": "빨간색 목걸이를 하고 있어요",
+          "likesCount": 0
         },
       },
     },
-  })
+  }
+  )
   @ApiResponse({
     status: 400,
     description: '피드 생성 실패',
@@ -233,33 +285,33 @@ export class FeedController {
       example: {
         httpStatus: 200,
         success: true,
-        data: {
-          id: 5,
-          author: {
-            id: 6,
-            serialId: 'example1234',
-            password:
-              '$2b$10$sbzOiWZRxrKHEevoDS/jiO/e2yx20I6N6d0cyEkH0UYRY0OREIYUa',
-            isLogin: true,
-            refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsImlhdCI6MTc0NDI4OTUyOCwiZXhwIjoxNzQ1NDk5MTI4fQ.y48YT3-vGVfx7j_Q82pXJY2btdp8m8m1nAu_qryomIw',
-            name: '수민띵',
-            createdAt: '2025-04-10T02:50:17.000Z',
-            updatedAt: '2025-04-10T03:52:08.000Z',
+        "data": {
+          "createdAt": "2025-05-14T01:13:33.000Z",
+          "updatedAt": "2025-05-14T01:13:33.000Z",
+          "id": 51,
+          "author": {
+            "createdAt": "2025-05-03T00:00:31.000Z",
+            "updatedAt": "2025-05-14T05:16:43.000Z",
+            "id": 15,
+            "serialId": "sumin1111@gachon.ac.kr",
+            "password": "$2b$10$x8GkJmTSTrHcijSGpqWP2O0960gZDXGJH1tEejWJ1E2MpxErc7Ftu",
+            "isLogin": true,
+            "role": "admin",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE1LCJpYXQiOjE3NDcyMzIyMDMsImV4cCI6MTc0ODQ0MTgwM30.n9RlmlJqFqHbXD8onn6pmsRgmEksQFbjefstOwG62UY",
+            "name": "수민띵"
           },
-          title: '생성할 피드(게시글) 제목.',
-          content: '생성할 피드(게시글) 내용.',
-          imageUrl: 'https://minio.example.com/bucket/1616161616_abcd',
-          lostDate: '2025-05-07',
-          lostPlace: '가천대학교 AI공학관',
-          placeFeature: '정문에서 제일 멀어요',
-          dogType: '말티즈',
-          dogAge: 7,
-          dogGender: '남자',
-          dogColor: '흰색',
-          dogFeature: '빨간색 목걸이를 하고 있어요',
-          likesCount: 0,
-          createdAt: '2025-04-10T02:51:40.279Z',
+          "title": "발견 강아지",
+          "content": "생성할 피드(게시글) 내용.",
+          "fileName": "sdlfmalsas-asdd",
+          "lostDate": "2025-05-13",
+          "lostPlace": "가천대학교 AI공학관",
+          "placeFeature": "정문에서 제일 멀어요",
+          "dogType": "말라뮤트",
+          "dogAge": 7,
+          "dogGender": "남자",
+          "dogColor": "흰색",
+          "dogFeature": "빨간색 목걸이를 하고 있어요",
+          "likesCount": 0
         },
       },
     },
@@ -286,8 +338,6 @@ export class FeedController {
     return ResponseDto.ok(feed);
   }
 
-
-
   @ApiOperation({
     summary: '내가 작성한 모든 피드(게시글) 조회',
     description: '내가 작성한 모든 피드(게시글)을 조회합니다.',
@@ -298,66 +348,52 @@ export class FeedController {
     description: '모든 피드(게시글) 조회 성공',
     schema: {
       example: {
-        httpStatus: 200,
-        success: true,
-        data: [
+        "httpStatus": 200,
+        "success": true,
+        "data": [
           {
-            id: 7,
-            author: {
-              id: 8,
-              serialId: 'sumin2201',
-              password:
-                '$2b$10$pPmBqYQnUu8.dVamgB6N9O19HiVSrD/pzFNJx22a1sVz0GFZ.mOMa',
-              isLogin: true,
-              refreshToken:
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ1NTYyMzk2fQ.5keoNz8vEiqx65vk18eVVbHSHvFTDwianTVbAvFDWa8',
-              name: '수민띵',
-              createdAt: '2025-04-10T21:12:14.000Z',
-              updatedAt: '2025-04-10T21:26:36.000Z',
-            },
-            title: '생성할 피드(게시글) 제목.',
-            content: '생성할 피드(게시글) 내용.',
-            imageUrl: 'https://minio.example.com/bucket/1616161616_abcd',
-            lostDate: '2025-05-07',
-            lostPlace: '가천대학교 AI공학관',
-            placeFeature: '정문에서 제일 멀어요',
-            dogType: '말티즈',
-            dogAge: 7,
-            dogGender: '남자',
-            dogColor: '흰색',
-            dogFeature: '빨간색 목걸이를 하고 있어요',
-            likesCount: 0,
-            createdAt: '2025-04-10T21:47:03.220Z',
+            "id": 52,
+            "title": "강아지 찾아줭",
+            "content": "생성할 피드(게시글) 내용.",
+            "fileName": "sdlfmalsas-asdd",
+            "lostDate": "2025-04-01",
+            "lostPlace": "세종대 양꼬치집",
+            "placeFeature": "세종대 근처에서 양꼬치 먹다가 잃어버렸어요",
+            "dogType": "말티푸",
+            "dogAge": 7,
+            "dogGender": "남자",
+            "dogColor": "흰색",
+            "dogFeature": "빨간색 목걸이를 하고 있어요",
+            "likesCount": 0,
+            "createdAt": "2025-05-15T19:16:06.000Z",
+            "updatedAt": "2025-05-15T19:16:06.000Z",
+            "author": {
+              "id": 15,
+              "name": "수민띵"
+            }
           },
           {
-            id: 8,
-            author: {
-              id: 8,
-              serialId: 'sumin2201',
-              password:
-                '$2b$10$pPmBqYQnUu8.dVamgB6N9O19HiVSrD/pzFNJx22a1sVz0GFZ.mOMa',
-              isLogin: true,
-              refreshToken:
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc0NDM1Mjc5NiwiZXhwIjoxNzQ1NTYyMzk2fQ.5keoNz8vEiqx65vk18eVVbHSHvFTDwianTVbAvFDWa8',
-              name: '수민띵',
-              createdAt: '2025-04-10T21:12:14.000Z',
-              updatedAt: '2025-04-10T21:26:36.000Z',
-            },
-            title: '생성할 피드(게시글) 제목.',
-            content: '생성할 피드(게시글) 내용.',
-            imageUrl: 'https://minio.example.com/bucket/1616161616_abcd',
-            lostDate: '2025-05-07',
-            lostPlace: '가천대학교 AI공학관',
-            placeFeature: '정문에서 제일 멀어요',
-            dogType: '말티즈',
-            dogAge: 7,
-            dogGender: '남자',
-            dogColor: '흰색',
-            dogFeature: '빨간색 목걸이를 하고 있어요',
-            likesCount: 0,
-            createdAt: '2025-04-10T21:47:03.897Z',
-          },
-        ],
+            "id": 51,
+            "title": "발견 강아지",
+            "content": "생성할 피드(게시글) 내용.",
+            "fileName": "sdlfmalsas-asdd",
+            "lostDate": "2025-05-13",
+            "lostPlace": "가천대학교 AI공학관",
+            "placeFeature": "정문에서 제일 멀어요",
+            "dogType": "말라뮤트",
+            "dogAge": 7,
+            "dogGender": "남자",
+            "dogColor": "흰색",
+            "dogFeature": "빨간색 목걸이를 하고 있어요",
+            "likesCount": 0,
+            "createdAt": "2025-05-14T01:13:33.000Z",
+            "updatedAt": "2025-05-14T01:13:33.000Z",
+            "author": {
+              "id": 15,
+              "name": "수민띵"
+            }
+          }
+        ]
       },
     },
   })
@@ -379,8 +415,6 @@ export class FeedController {
     const feeds = await this.feedService.getFeeds(userId);
     return ResponseDto.ok(feeds);
   }
-
-
 
   @ApiOperation({
     summary: '피드(게시글) 삭제',
@@ -422,6 +456,4 @@ export class FeedController {
     return ResponseDto.ok({ message: '피드(게시글) 삭제 성공' });
   }
 
-
 }
-
