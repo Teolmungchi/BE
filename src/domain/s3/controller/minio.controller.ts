@@ -32,13 +32,16 @@ export class MinioController {
     description: 'Presigned URL 반환 성공',
     schema: {
       example: {
-        httpStatus: 200,
-        success: true,
-        data: {
-          url: 'http://localhost:9000/tmc/1744354182542_27999?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250411%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250411T064942Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=96f13378a43c2f2130be1929e6fb783fd971d776a70c6efedb241f590c76cac1',
+        'httpStatus': 200,
+        'success': true,
+        'data': {
+          'url': 'http://tmc.kro.kr:9000/tmc/1747372137008_8bb64d30?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250516%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250516T050857Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b1a8ea33a706dd880cd420ce210897de225d4def678199054b0b6a85c34d5fe4',
+          'fileName': '1747372137008_8bb64d30',
+          'expiration': 3600,
         },
       },
     },
+
   })
   @ApiResponse({
     status: 401,
