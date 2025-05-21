@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { MatchService } from '../match.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../global/common/guards/jwt-auth.guard';
@@ -39,9 +39,21 @@ export class MatchController {
   @Post()
   async matchBulk(
     @Req() req,
-    @Body() body: { results: { feed_id: number; authorId: number; similarity_score: number }[] }
+    @Body() body: { results: { feed_id: number; similarity_score: number }[] }
   ): Promise<ResponseDto<any>> {
-    const results = await this.matchService.createMatchingResultsBulk(body.results);
+    const authorId = req.user.id;
+    const results = await this.matchService.createMatchingResultsBulk(authorId, body.results);
     return ResponseDto.ok(results);
   }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getMyMatchingResults(@Req() req): Promise<ResponseDto<any>> {
+    const userId = req.user.id;
+    const results = await this.matchService.getHighSimilarityFindersForProtector(userId);
+    return ResponseDto.ok(results);
+  }
+
+
+
 }
