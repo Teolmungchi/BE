@@ -7,10 +7,11 @@ import { DatabaseModule } from '../../global/database/module/database.module';
 import { FeedRepository } from '../feed/repository/feed.repository';
 import { MatchingResult } from './entity/matching-result.entity';
 import { UsersModule } from '../users/module/users.module';
+import { MinioService } from '../s3/service/minio.service';
 
 @Module({
   imports: [DatabaseModule, UsersModule, TypeOrmModule.forFeature([MatchingResult ,Feed,])],
   controllers: [MatchController],
-  providers: [MatchService, FeedRepository],
+  providers: [MatchService, FeedRepository, MinioService],
 })
 export class MatchModule {}

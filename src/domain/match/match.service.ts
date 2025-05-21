@@ -8,6 +8,7 @@ import { ErrorCode } from '../../global/exception/error-code';
 import { CommonException } from '../../global/exception/common-exception';
 import { FeedRepository } from '../feed/repository/feed.repository';
 import { UserRepository } from '../users/repository/user.repository';
+import { MinioService } from '../s3/service/minio.service';
 
 @Injectable()
 export class MatchService {
@@ -16,6 +17,7 @@ export class MatchService {
     private readonly matchingResultRepository: Repository<MatchingResult>,
     private feedRepository: FeedRepository,
     private userRepository: UserRepository,
+    private readonly minioService: MinioService,
   ) {}
 
   async createMatchingResultsBulk(
@@ -91,7 +93,7 @@ export class MatchService {
 
   async getHighSimilarityFindersForProtector(
     userId: number,
-  ): Promise<{ finderId: number; message: string }[]> {
+  ): Promise<{ finderId: number; message: string; presigned_url: string }[]> {
     // 1. 보호자가 작성한 feed 목록 조회
     const feeds = await this.feedRepository.find({
       where: { author: { id: userId } },
@@ -103,19 +105,27 @@ export class MatchService {
       return [];
     }
 
-    // 2. 해당 feedId에 대한 similarity 80 이상인 MatchingResult 조회
+    // 2. 해당 feedId에 대한 similarity 80 이상인 MatchingResult 조회 (feed, user, feed.fileName 필요)
     const matchingResults = await this.matchingResultRepository.find({
       where: {
         feed: { id: In(feedIds) },
         similarity: MoreThanOrEqual(80),
       },
-      relations: ['user'], // 발견자 정보
+      relations: ['user', 'feed'],
     });
 
-    // 3. 발견자 id와 메시지만 추출해서 반환
-    return matchingResults.map((result) => ({
-      finderId: result.user.id,
-      message: `유사도${result.similarity}인 제보가 들어왔어요!`,
-    }));
+    // 3. presigned_url 발급 및 결과 생성
+    return Promise.all(
+      matchingResults.map(async (result) => {
+        // presigned_url 발급 (feed.fileName 사용)
+        const presigned = await this.minioService.getPresignedUrlForDownload(result.feed.fileName);
+        return {
+          finderId: result.user.id,
+          message: `유사도${result.similarity}인 제보가 들어왔어요!`,
+          presigned_url: presigned.url,
+        };
+      }),
+    );
   }
+
 }
