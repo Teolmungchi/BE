@@ -21,15 +21,21 @@ export class MatchService {
 
   async createMatchingResultsBulk(
     results: { feed_id: number; authorId: number; similarity_score: number }[]
-  ): Promise<{ feed_id: number; authorId: number; saved: boolean; message?: string }[]> {
-
+  ): Promise<{
+    feed_id: number;
+    authorId: number;
+    reporterId?: number;
+    similarity?: number;
+    saved: boolean;
+    message?: string;
+  }[]> {
     if (!Array.isArray(results)) {
       throw new BadRequestException('results 필드는 배열이어야 합니다.');
     }
     if (results.length === 0) {
       throw new BadRequestException('results 배열이 비어있습니다.');
     }
-    // 여러 결과를 병렬로 저장
+
     return Promise.all(
       results.map(async (item) => {
         try {
@@ -41,22 +47,31 @@ export class MatchService {
           const feed = await this.feedRepository.findOne({ where: { id: item.feed_id }, relations: ['author'] });
           if (!feed) throw new CommonException(ErrorCode.NOT_FOUND_FEED);
 
-          const user = await this.userRepository.findOne({ where: { id: item.authorId } });
-          if (!user) throw new CommonException(ErrorCode.NOT_FOUND_USER);
+          const finder = await this.userRepository.findOne({ where: { id: item.authorId } });
+          if (!finder) throw new CommonException(ErrorCode.NOT_FOUND_USER);
+
+          // feed.author가 신고자(잃어버린 사람)
+          const reporter = feed.author;
 
           const result = this.matchingResultRepository.create({
             feed,
-            user,
+            user: finder,
             similarity: percent,
             status,
           });
           await this.matchingResultRepository.save(result);
 
+          // 결과 객체에 발견자, 신고자, 유사도, feed_id 포함
           return {
             feed_id: item.feed_id,
-            authorId: item.authorId,
+            authorId: finder.id, // 발견자
+            reporterId: reporter.id, // 신고자
+            similarity: percent,
             saved: true,
-            message: percent >= 80 ? `잃어버린 동물을 제보해주셨어요! 유사도 ${Math.round(percent)}%!` : undefined,
+            message:
+              percent >= 80
+                ? `잃어버린 동물을 제보해주셨어요! 유사도 ${Math.round(percent)}%!`
+                : undefined,
           };
         } catch (e) {
           return {
@@ -69,5 +84,6 @@ export class MatchService {
       })
     );
   }
+
 
 }
