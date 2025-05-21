@@ -124,8 +124,8 @@ export class FeedController {
     },
   })
   @Get('all-urls')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
   async getAllFeedUrls(@Req() req): Promise<ResponseDto<FeedUrlResponseDto[]>> {
     const feeds = await this.feedService.getAllFeedUrls();
     return ResponseDto.ok(feeds);
