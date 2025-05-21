@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchingResult } from './entity/matching-result.entity';
 import { Feed } from '../feed/entity/feed.entity';
-import { Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { MatchingStatus } from './entity/matching-status.enum';
 import { ErrorCode } from '../../global/exception/error-code';
 import { CommonException } from '../../global/exception/common-exception';
@@ -18,14 +18,14 @@ export class MatchService {
     private userRepository: UserRepository,
   ) {}
 
-
   async createMatchingResultsBulk(
-    results: { feed_id: number; authorId: number; similarity_score: number }[]
+    authorId: number, // 발견자 id
+    results: { feed_id: number; similarity_score: number }[]
   ): Promise<{
     feed_id: number;
-    authorId: number;
-    reporterId?: number;
-    similarity?: number;
+    authorId: number; // 발견자 id
+    reporterId: number; // 신고자 id (feed.author.id)
+    similarity: number;
     saved: boolean;
     message?: string;
   }[]> {
@@ -36,36 +36,32 @@ export class MatchService {
       throw new BadRequestException('results 배열이 비어있습니다.');
     }
 
-    return Promise.all(
+    const finder = await this.userRepository.findOne({ where: { id: authorId } });
+    if (!finder) throw new CommonException(ErrorCode.NOT_FOUND_USER);
+
+    const allResults = await Promise.all(
       results.map(async (item) => {
         try {
-          // percent 계산
           const percent = item.similarity_score > 1 ? item.similarity_score : item.similarity_score * 100;
           const status = percent >= 80 ? MatchingStatus.FOUND : MatchingStatus.NOT_FOUND;
 
-          // feed, user 조회
           const feed = await this.feedRepository.findOne({ where: { id: item.feed_id }, relations: ['author'] });
           if (!feed) throw new CommonException(ErrorCode.NOT_FOUND_FEED);
 
-          const finder = await this.userRepository.findOne({ where: { id: item.authorId } });
-          if (!finder) throw new CommonException(ErrorCode.NOT_FOUND_USER);
-
-          // feed.author가 신고자(잃어버린 사람)
           const reporter = feed.author;
 
           const result = this.matchingResultRepository.create({
             feed,
-            user: finder,
+            user: finder, // 발견자
             similarity: percent,
             status,
           });
           await this.matchingResultRepository.save(result);
 
-          // 결과 객체에 발견자, 신고자, 유사도, feed_id 포함
           return {
             feed_id: item.feed_id,
-            authorId: finder.id, // 발견자
-            reporterId: reporter.id, // 신고자
+            authorId: authorId,         // 발견자 id
+            reporterId: reporter.id,    // 신고자 id
             similarity: percent,
             saved: true,
             message:
@@ -74,16 +70,52 @@ export class MatchService {
                 : undefined,
           };
         } catch (e) {
-          return {
-            feed_id: item.feed_id,
-            authorId: item.authorId,
-            saved: false,
-            message: e.message,
-          };
+          return null;
         }
       })
+    );
+
+    // 80% 이상만 응답
+    return allResults.filter(
+      (item): item is {
+        feed_id: number;
+        authorId: number;
+        reporterId: number;
+        similarity: number;
+        saved: boolean;
+        message: string;
+      } => !!item && item.saved && typeof item.similarity === 'number' && item.similarity >= 80
     );
   }
 
 
+  async getHighSimilarityFindersForProtector(
+    userId: number,
+  ): Promise<{ finderId: number; message: string }[]> {
+    // 1. 보호자가 작성한 feed 목록 조회
+    const feeds = await this.feedRepository.find({
+      where: { author: { id: userId } },
+      select: ['id'],
+    });
+    const feedIds = feeds.map((feed) => feed.id);
+
+    if (feedIds.length === 0) {
+      return [];
+    }
+
+    // 2. 해당 feedId에 대한 similarity 80 이상인 MatchingResult 조회
+    const matchingResults = await this.matchingResultRepository.find({
+      where: {
+        feed: { id: In(feedIds) },
+        similarity: MoreThanOrEqual(80),
+      },
+      relations: ['user'], // 발견자 정보
+    });
+
+    // 3. 발견자 id와 메시지만 추출해서 반환
+    return matchingResults.map((result) => ({
+      finderId: result.user.id,
+      message: `유사도${result.similarity}인 제보가 들어왔어요!`,
+    }));
+  }
 }
