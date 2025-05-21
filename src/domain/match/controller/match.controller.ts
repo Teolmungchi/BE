@@ -45,5 +45,3 @@ export class MatchController {
     return ResponseDto.ok(results);
   }
 }
-
-
