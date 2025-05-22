@@ -46,11 +46,12 @@ export class MatchController {
     return ResponseDto.ok(results);
   }
 
+  @ApiOperation({ summary: '알림창 조회', description: '알림창 보관함에서 알림을 리스트로 가져옵니다.'})
   @Get()
   @UseGuards(JwtAuthGuard)
   async getMyMatchingResults(@Req() req): Promise<ResponseDto<any>> {
     const userId = req.user.id;
-    const results = await this.matchService.getHighSimilarityFindersForProtector(userId);
+    const results = await this.matchService.getSimilarities(userId);
     return ResponseDto.ok(results);
   }
 
