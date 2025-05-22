@@ -91,7 +91,7 @@ export class MatchService {
   }
 
 
-  async getHighSimilarityFindersForProtector(
+  async getSimilarities(
     userId: number,
   ): Promise<{ finderId: number; message: string; presigned_url: string }[]> {
     // 1. 보호자가 작성한 feed 목록 조회
