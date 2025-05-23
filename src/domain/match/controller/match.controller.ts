@@ -28,12 +28,16 @@ export class MatchController {
     description: '매칭 결과 반환',
     schema: {
       example: {
-        httpStatus: 200,
-        success: true,
-        data: {
-          message: '잃어버린 동물을 제보해주셨어요! 유사도 80%!',
-          userId: 18,
-        },
+        "httpStatus": 200,
+        "success": true,
+        "data": [
+          {
+            "finderId": 11,
+            "message": "유사도 91%인 제보가 들어왔어요!",
+            "presigned_url": "http://localhost:9000/tmc/sdlfmalsas-asdd?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250523%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250523T140102Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=f402ca5a1dacad2cd3e413369f593c72c148e1f98ac5d5452f37a6277a7fed23",
+            "finder_presigned_url": "http://localhost:9000/tmc/1748008571478_4a65ff1b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=root%2F20250523%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250523T140102Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=d6b3d144f8b1fd7c250f0767ebe87f2679db1f4ee8e10b81d9ad33ce2ba37f98"
+          }
+        ]
       },
     },
   })
