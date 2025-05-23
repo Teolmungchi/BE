@@ -15,7 +15,7 @@ export class MatchingResult extends BaseTime {
   feed: Feed;
 
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'userId', referencedColumnName: 'id' }) // id는 User 엔티티의 필드명, 실제 DB는 user_id
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: User;
 
   @Column({ type: 'enum', enum: MatchingStatus })
