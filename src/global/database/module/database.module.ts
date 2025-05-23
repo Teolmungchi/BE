@@ -8,7 +8,7 @@ import { Like } from '../../../domain/like/entity/like.entity';
 import { ChatRoom } from '../../../domain/chat/entity/chat-room.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MatchingResult } from '../../../domain/match/entity/matching-result.entity';
-import { Report } from '../../../domain/report/entity/report.entity';
+import { Reports } from '../../../domain/match/entity/reports.entity';
 
 dotenv.config();
 
@@ -21,14 +21,14 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, Feed, Like, ChatRoom, MatchingResult, Report],
+      entities: [User, Feed, Like, ChatRoom, MatchingResult, Reports],
       synchronize: true,
       charset: 'utf8mb4',
     }),
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/chat',
     ),
-    TypeOrmModule.forFeature([User, Feed, Like, ChatRoom, MatchingResult, Report]),
+    TypeOrmModule.forFeature([User, Feed, Like, ChatRoom, MatchingResult, Reports]),
   ],
   exports: [TypeOrmModule, MongooseModule],
 })

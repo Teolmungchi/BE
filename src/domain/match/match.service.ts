@@ -9,12 +9,16 @@ import { CommonException } from '../../global/exception/common-exception';
 import { FeedRepository } from '../feed/repository/feed.repository';
 import { UserRepository } from '../users/repository/user.repository';
 import { MinioService } from '../s3/service/minio.service';
+import { Reports } from './entity/reports.entity';
+import { User } from '../users/entity/user.entity';
 
 @Injectable()
 export class MatchService {
   constructor(
     @InjectRepository(MatchingResult)
     private readonly matchingResultRepository: Repository<MatchingResult>,
+    @InjectRepository(Reports)
+    private readonly reportRepository: Repository<Reports>,
     private feedRepository: FeedRepository,
     private userRepository: UserRepository,
     private readonly minioService: MinioService,
@@ -93,8 +97,12 @@ export class MatchService {
 
   async getSimilarities(
     userId: number,
-  ): Promise<{ finderId: number; message: string; presigned_url: string }[]> {
-    // 1. 보호자가 작성한 feed 목록 조회
+  ): Promise<{
+    finderId: number;
+    message: string;
+    presigned_url: string;
+    finder_presigned_url: string | null; // 타입 변경
+  }[]> {
     const feeds = await this.feedRepository.find({
       where: { author: { id: userId } },
       select: ['id'],
@@ -105,7 +113,6 @@ export class MatchService {
       return [];
     }
 
-    // 2. 해당 feedId에 대한 similarity 90 이상인 MatchingResult 조회 (feed, user, feed.fileName 필요)
     const matchingResults = await this.matchingResultRepository.find({
       where: {
         feed: { id: In(feedIds) },
@@ -114,18 +121,65 @@ export class MatchService {
       relations: ['user', 'feed'],
     });
 
-    // 3. presigned_url 발급 및 결과 생성
+    if (matchingResults.length === 0) {
+      return [];
+    }
+
+    const finderIds = [
+      ...new Set(matchingResults.map((result) => result.user.id)),
+    ];
+
+    const finderReports = await this.reportRepository.find({
+      where: { author: { id: In(finderIds) } },
+      relations: ['author'],
+    });
+
+
+
+    const finderReportMap = new Map<number, typeof finderReports[0]>();
+    finderReports.forEach(report => {
+      if (!finderReportMap.has(report.author.id)) { // Report.author.id 라고 가정
+        finderReportMap.set(report.author.id, report);
+      }
+    });
+
+
     return Promise.all(
       matchingResults.map(async (result) => {
-        // presigned_url 발급 (feed.fileName 사용)
-        const presigned = await this.minioService.getPresignedUrlForDownload(result.feed.fileName);
+        const presignedFeedUrl = await this.minioService.getPresignedUrlForDownload(
+          result.feed.fileName,
+        );
+
+        let finderReportPresignedUrl: string | null = null;
+        const finderReport = finderReportMap.get(result.user.id);
+
+        if (finderReport && finderReport.fileName) {
+          const urlResult = await this.minioService.getPresignedUrlForDownload(
+            finderReport.fileName,
+          );
+          finderReportPresignedUrl = urlResult.url;
+        }
+
         return {
           finderId: result.user.id,
-          message: `유사도${result.similarity}인 제보가 들어왔어요!`,
-          presigned_url: presigned.url,
+          message: `유사도 ${result.similarity}%인 제보가 들어왔어요!`,
+          presigned_url: presignedFeedUrl.url,
+          finder_presigned_url: finderReportPresignedUrl,
         };
       }),
     );
   }
 
+
+  async saveReport(userId: number, body: { fileName: string }): Promise<Reports> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new CommonException(ErrorCode.NOT_FOUND_USER);
+    }
+
+    const report = new Reports();
+    report.fileName = body.fileName;
+    report.author = { id: userId } as User;
+    return await this.reportRepository.save(report);
+  }
 }
