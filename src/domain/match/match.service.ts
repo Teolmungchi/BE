@@ -101,7 +101,7 @@ export class MatchService {
     finderId: number;
     message: string;
     presigned_url: string;
-    finder_presigned_url: string | null; // 타입 변경
+    finder_presigned_url: string | null;
   }[]> {
     const feeds = await this.feedRepository.find({
       where: { author: { id: userId } },
