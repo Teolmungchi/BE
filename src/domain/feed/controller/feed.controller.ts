@@ -87,8 +87,8 @@ export class FeedController {
   // feed.controller.ts
 
   @ApiOperation({
-    summary: '모든 피드(게시글) 조회',
-    description: '모든 피드(게시글)을 조회합니다.',
+    summary: '모든 피드 url(게시글) 조회',
+    description: '모든 피드 url(게시글)을 조회합니다.',
   })
   @ApiResponse({
     status: 200,

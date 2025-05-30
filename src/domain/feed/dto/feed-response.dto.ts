@@ -4,7 +4,7 @@ export class FeedResponseDto {
   id: number;
   title: string;
   content: string;
-  fileName: string;
+  presignedUrl: string;
   lostDate: Date;
   lostPlace: string;
   placeFeature: string;

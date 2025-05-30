@@ -1,4 +1,4 @@
-import { Injectable, UseFilters } from '@nestjs/common';
+import { Injectable, Logger, UseFilters } from '@nestjs/common';
 import { HttpExceptionFilter } from '../../../global/exception/filter/http-exception.filter';
 import { FeedRepository } from '../repository/feed.repository';
 import { CreateFeedDto } from '../dto/create-feed.dto';
@@ -10,6 +10,7 @@ import { UserRepository } from '../../users/repository/user.repository';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { FeedUrlResponseDto } from '../dto/feed-url-response.dto';
 import { MinioService } from '../../s3/service/minio.service';
+import { PresignedUrlDto } from '../../s3/dto/presigned-url.dto';
 
 @Injectable()
 @UseFilters(HttpExceptionFilter)
@@ -130,28 +131,53 @@ export class FeedService {
       order: { createdAt: 'DESC' },
     });
 
-    // DTO 변환
-    return feeds.map(feed => ({
-      id: feed.id,
-      title: feed.title,
-      content: feed.content,
-      fileName: feed.fileName,
-      lostDate: feed.lostDate,
-      lostPlace: feed.lostPlace,
-      placeFeature: feed.placeFeature,
-      dogType: feed.dogType,
-      dogAge: feed.dogAge,
-      dogGender: feed.dogGender,
-      dogColor: feed.dogColor,
-      dogFeature: feed.dogFeature,
-      likesCount: feed.likesCount,
-      createdAt: feed.createdAt,
-      updatedAt: feed.updatedAt,
-      author: {
-        id: feed.author.id,
-        name: feed.author.name,
-      },
-    }));
+    // DTO 변환 및 presigned URL 생성
+    const feedResponseDtos = await Promise.all(
+      feeds.map(async (feed) => {
+        let filePresignedUrl: string = '';
+
+        if (feed.fileName) {
+          try {
+            // minioService를 사용하여 presigned URL 가져오기
+            // getPresignedUrlForDownload는 PresignedUrlDto를 반환
+            const presignedUrlDto: PresignedUrlDto = await this.minioService.getPresignedUrlForDownload(feed.fileName);
+            filePresignedUrl = presignedUrlDto.url; // DTO에서 url 필드 사용
+          } catch (error) {
+            // getPresignedUrlForDownload 내부에서 CommonException을 throw하므로
+            // 여기서 추가적인 로깅을 하거나, 에러 발생 시 null로 처리할 수 있습니다.
+            // 이미 minioService에서 로깅을 하고 있다면 중복 로깅은 피할 수 있습니다.
+            Logger.error(`Feed ID ${feed.id}의 파일(${feed.fileName})에 대한 presigned URL 생성 실패:`, error.message);
+            // filePresignedUrl은 null로 유지됩니다.
+            // 만약 하나의 URL 생성 실패가 전체 요청 실패로 이어져야 한다면, 여기서 다시 throw 할 수 있습니다.
+            // throw error;
+          }
+        }
+
+        return {
+          id: feed.id,
+          title: feed.title,
+          content: feed.content,
+          presignedUrl: filePresignedUrl, // 생성된 presigned URL (실패 시 null)
+          lostDate: feed.lostDate,
+          lostPlace: feed.lostPlace,
+          placeFeature: feed.placeFeature,
+          dogType: feed.dogType,
+          dogAge: feed.dogAge,
+          dogGender: feed.dogGender,
+          dogColor: feed.dogColor,
+          dogFeature: feed.dogFeature,
+          likesCount: feed.likesCount,
+          createdAt: feed.createdAt,
+          updatedAt: feed.updatedAt,
+          author: {
+            id: feed.author.id,
+            name: feed.author.name,
+          },
+        };
+      }),
+    );
+
+    return feedResponseDtos;
   }
 
   async getAllFeedUrls(): Promise<FeedUrlResponseDto[]> {
